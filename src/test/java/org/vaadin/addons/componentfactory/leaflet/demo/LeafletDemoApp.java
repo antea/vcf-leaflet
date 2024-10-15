@@ -38,10 +38,7 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenu;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenuItem;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.ControlPositionExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.LayersControlExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.RemoveDefaultControlsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.ScaleControlExample;
+import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.*;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.layers.GeoJSONEventsExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.layers.GeoJSONFilterExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.layers.GeoJSONLayerExample;
@@ -150,9 +147,12 @@ public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver
 				.addSubMenu(PathsStyleExample.class).addTo(appMenu);
 
 		// Controls examples
-		AppMenuItem.create("Controls", new Icon(VaadinIcon.ARROWS)).addSubMenu(RemoveDefaultControlsExample.class)
-        .addSubMenu(LayersControlExample.class)
-				.addSubMenu(ControlPositionExample.class).addSubMenu(ScaleControlExample.class).addTo(appMenu);
+		AppMenuItem.create("Controls", new Icon(VaadinIcon.ARROWS))
+				.addSubMenu(RemoveDefaultControlsExample.class)
+				.addSubMenu(LayersControlExample.class)
+				.addSubMenu(ControlPositionExample.class)
+				.addSubMenu(PrintControlExample.class)
+				.addSubMenu(ScaleControlExample.class).addTo(appMenu);
 
 		// Mixins examples
 		AppMenuItem.create("Mixin", new Icon(VaadinIcon.SHIELD)).addSubMenu(WorldMapFlagsExample.class).addTo(appMenu);
