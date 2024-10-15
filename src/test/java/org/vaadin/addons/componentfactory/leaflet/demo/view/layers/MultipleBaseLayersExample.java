@@ -14,9 +14,8 @@
 
 package org.vaadin.addons.componentfactory.leaflet.demo.view.layers;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.controls.LayersControl;
 import org.vaadin.addons.componentfactory.leaflet.controls.LayersControlOptions;
@@ -26,9 +25,12 @@ import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
+import org.vaadin.addons.componentfactory.leaflet.layer.raster.GoogleLayerProducer;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @PageTitle("Multiple base layers")
 @Route(value = "layers/baselayers", layout = LeafletDemoApp.class)
@@ -60,8 +62,10 @@ public class MultipleBaseLayersExample extends ExampleContainer {
         TileLayer grayscale = new TileLayer("https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png");
         grayscale.setAttribution("wmflabs OSM B&W mapnik map grayscale");
 
-        Map<String, Layer> baseLayers = new HashMap<String, Layer>();
+        Map<String, Layer> baseLayers = new LinkedHashMap<>();
         baseLayers.put("OpenStreetmap default", openStreetmap);
+        baseLayers.put("Google satellite", GoogleLayerProducer.of(GoogleLayerProducer.LayerType.SATELLITE));
+        baseLayers.put("Google street", GoogleLayerProducer.of(GoogleLayerProducer.LayerType.STREET));
         baseLayers.put("Mapquest layer", mapQuest);
         baseLayers.put("Wikimedia Maps", wikimedia);
         baseLayers.put("OpenCycleMap", openCycleMap);
