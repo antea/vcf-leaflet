@@ -19,3 +19,4 @@ package*.json
 webpack.config.js
 webpack.generated.js
 pnpm-lock.yaml
+error-screenshots/

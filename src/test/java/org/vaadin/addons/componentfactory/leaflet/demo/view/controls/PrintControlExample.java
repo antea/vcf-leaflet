@@ -8,7 +8,9 @@ import org.vaadin.addons.componentfactory.leaflet.demo.LeafletDemoApp;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.ExampleContainer;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePosition;
 import org.vaadin.addons.componentfactory.leaflet.plugins.print.BigImageControl;
+import org.vaadin.addons.componentfactory.leaflet.plugins.print.EasyPrintControl;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
 @PageTitle("Print control")
@@ -28,6 +30,13 @@ public class PrintControlExample extends ExampleContainer {
         bigImageControl.setPosition(LeafletControl.ControlPosition.topleft);
         bigImageControl.addTo(leafletMap);
 
+        EasyPrintControl easyPrintControl = new EasyPrintControl();
+        easyPrintControl.setPosition(LeafletControl.ControlPosition.topleft);
+        easyPrintControl.addTo(leafletMap);
+
+        MousePosition mousePosition = new MousePosition();
+        mousePosition.setPosition(LeafletControl.ControlPosition.bottomleft);
+        mousePosition.addTo(leafletMap);
         addToContent(leafletMap);
     }
 }
