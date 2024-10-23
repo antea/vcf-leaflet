@@ -81,7 +81,6 @@ import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.TiledMapLaye
 import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.VectorBasemapLayerPluginExample;
 
 @CssImport(value = "styles/demo-applayout.css", themeFor = "vaadin-app-layout")
-@Theme(value = Lumo.class, variant = Lumo.LIGHT)
 public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver {
 
 	private static final long serialVersionUID = -9119767347112138141L;

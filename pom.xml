@@ -6,27 +6,31 @@
 	<artifactId>vcf-leaflet</artifactId>
 	<version>1.0.1.1-ANTEA-SNAPSHOT</version>
 	<name>Leaflet</name>
-	<description>Integration of Leaflet Map for Vaadin Flow</description>
+	<description>Integration of Leaflet Map for Vaadin Flow with more plugins!</description>
 	<scm>
 		<url>https://github.com/vaadin-component-factory/vcf-leaflet</url>
 		<connection>scm:git:git://https://github.com/vaadin-component-factory/vcf-leaflet.git</connection>
 		<developerConnection>scm:git:git@https://github.com/vaadin-component-factory/vcf-leaflet.git</developerConnection>
 	</scm>
 	<properties>
-		<vaadin.version>14.10.11</vaadin.version>
+		<vaadin.version>23.4.0</vaadin.version>
 
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<drivers.dir>${project.basedir}/drivers</drivers.dir>
 
-		<jetty.version>9.4.36.v20210114</jetty.version>
+		<jetty.version>9.4.50.v20221201</jetty.version>
 		<webapp-runner.version>9.0.31.0</webapp-runner.version>
 
-		<maven-war-plugin.version>3.2.3</maven-war-plugin.version>
-		<heroku-maven-plugin>3.0.1</heroku-maven-plugin>
+		<!-- Vaadin add-on metadata -->
+		<vaadin.addon.owner>Vaadin Ltd</vaadin.addon.owner>
+		<vaadin.addon.license>Apache License 2.0</vaadin.addon.license>
+		<vaadin.addon.name>${project.name}</vaadin.addon.name>
+		<vaadin.addon.jar>${project.build.finalName}.${project.packaging}</vaadin.addon.jar>
+		<vaadin.addon.version>${project.version}</vaadin.addon.version>
 	</properties>
 	<organization>
 		<name>Vaadin Ltd</name>
@@ -68,11 +72,6 @@
 			<id>Vaadin prereleases</id>
 			<url>https://maven.vaadin.com/vaadin-prereleases</url>
 		</repository>
-		<!-- Repository needed for the snapshot versions of Vaadin -->
-		<repository>
-			<id>vaadin-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -88,60 +87,53 @@
 			<id>Vaadin prereleases</id>
 			<url>https://maven.vaadin.com/vaadin-prereleases</url>
 		</pluginRepository>
-		<pluginRepository>
-			<id>vaadin-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</pluginRepository>
 	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<!-- Replace artifactId with vaadin-core to use only free components -->
-			<artifactId>vaadin</artifactId>
-			<exclusions>
-				<!-- Webjars are only needed when running in Vaadin 13 compatibility 
-					mode in V14. Your add-on can support npm in the same version mode and V13 
-					compatiblity mode at the same time, or with separate versions. Any V13 version 
-					should work with the compatibility mode in V14. -->
-				<exclusion>
-					<groupId>com.vaadin.webjar</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.webjars.bowergithub.insites</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.webjars.bowergithub.polymer</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.webjars.bowergithub.polymerelements</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.webjars.bowergithub.vaadin</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.webjars.bowergithub.webcomponents</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
+			<!-- Try to keep transitive dependencies in add-ons to minium.
+                 Usually flow-server is enough, but if you extend an existing
+                 component, add that directly as well or change to
+                 vaadin/vaadin-core (worse option)
+            -->
+			<artifactId>flow-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-lumo-theme</artifactId>
+		</dependency>
+		<!-- Shouldn't be needed, probably a bug the flow-client is not brought in via flow-server-->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>flow-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<!-- Other components are probably handy when building test views -->
+			<!-- Replace artifactId with vaadin to use commercial components -->
+			<artifactId>vaadin-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>de.grundid.opendatalab</groupId>
 			<artifactId>geojson-jackson</artifactId>
 			<version>1.13</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.fasterxml.jackson.core</groupId>-->
+<!--			<artifactId>jackson-annotations</artifactId>-->
+<!--			<version>2.12.0</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.14.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -175,30 +167,9 @@
 		<defaultGoal>jetty:run</defaultGoal>
 		<plugins>
 			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.1.0</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>node_modules</directory>
-						</fileset>
-						<fileset>
-							<directory>${basedir}</directory>
-							<includes>
-								<include>package.json</include>
-								<include>package-lock.json</include>
-								<include>pnpm-lock.yaml</include>
-								<include>webpack.config.js</include>
-								<include>webpack.generated.js</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.1.2</version>
 				<configuration>
 					<archive>
 						<index>true</index>
@@ -207,7 +178,13 @@
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 						<manifestEntries>
+							<!-- Package format version - do not change these.
+                                    Instead edit the properties in the beginning of pom.xml -->
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
+							<Implementation-Title>${vaadin.addon.name}</Implementation-Title>
+							<Implementation-Vendor>${vaadin.addon.owner}</Implementation-Vendor>
+							<Implementation-Version>${vaadin.addon.version}</Implementation-Version>
+							<Vaadin-License-Title>${vaadin.addon.license}</Vaadin-License-Title>
 						</manifestEntries>
 					</archive>
 				</configuration>
@@ -230,20 +207,18 @@
 				<version>${jetty.version}</version>
 				<configuration>
 					<scanIntervalSeconds>3</scanIntervalSeconds>
-					<!-- Use test scope because the UI/demo classes are in the test package. -->
+					<!-- Use test scope because the UI/demo classes are in
+                            the test package. -->
 					<useTestScope>true</useTestScope>
 					<supportedPackagings>
 						<supportedPackaging>jar</supportedPackaging>
 					</supportedPackagings>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 
 	<profiles>
-
-		<!-- Vaadin Directory Profile -->
 		<profile>
 			<id>directory</id>
 			<build>
@@ -251,11 +226,11 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.4.2</version>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
-								<descriptor>assembly/assembly.xml</descriptor>
+								<descriptor>src/assembly/assembly.xml</descriptor>
 							</descriptors>
 						</configuration>
 						<executions>
@@ -270,7 +245,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>3.2.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -295,14 +270,15 @@
 							</execution>
 						</executions>
 						<configuration>
+							<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 							<quiet>true</quiet>
-							<additionalparam>-Xdoclint:none</additionalparam>
+							<doclint>none</doclint>
 						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>3.1.2</version>
+						<version>3.3.0</version>
 						<configuration>
 							<!-- Generated file that shouldn't be included in add-ons -->
 							<excludes>
@@ -314,7 +290,7 @@
 			</build>
 		</profile>
 
-		<!-- Run (demo) in production mode -->
+		<!-- Run (demo) in production mode-->
 		<profile>
 			<id>production</id>
 			<properties>
@@ -335,22 +311,17 @@
 						<executions>
 							<execution>
 								<goals>
-									<goal>prepare-frontend</goal>
 									<goal>build-frontend</goal>
 								</goals>
 							</execution>
 						</executions>
-						<configuration>
-							<optimizeBundle>false</optimizeBundle>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 
-		<!-- Integration test profile -->
 		<profile>
-			<id>integration-tests</id>
+			<id>it</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -382,35 +353,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<plugin>
-						<groupId>com.lazerycode.selenium</groupId>
-						<artifactId>driver-binary-downloader-maven-plugin
-						</artifactId>
-						<version>1.0.17</version>
-						<configuration>
-							<onlyGetDriversForHostOperatingSystem>
-								true
-							</onlyGetDriversForHostOperatingSystem>
-							<rootStandaloneServerDirectory>
-								${drivers.dir}/driver
-							</rootStandaloneServerDirectory>
-							<downloadedZipFileDirectory>
-								${drivers.dir}/driver_zips
-							</downloadedZipFileDirectory>
-							<customRepositoryMap>
-								${project.basedir}/drivers.xml
-							</customRepositoryMap>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>selenium</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
@@ -426,21 +368,16 @@
 						<configuration>
 							<trimStackTrace>false</trimStackTrace>
 							<enableAssertions>true</enableAssertions>
-							<systemPropertyVariables>
-								<!-- Pass location of downloaded webdrivers to the tests -->
-								<webdriver.chrome.driver>
-									${webdriver.chrome.driver}
-								</webdriver.chrome.driver>
-							</systemPropertyVariables>
 						</configuration>
 					</plugin>
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.3.0</version>
 						<executions>
 							<execution>
-								<!-- Since the view class is defined in test, after compilation copy 
-									it to the runtime classpath to ensure it gets visited by vaadin-maven-plugin -->
+								<!-- Since the view class is defined in test, after compilation
+                                copy it to the runtime classpath to ensure it gets visited by
+                                  vaadin-maven-plugin -->
 								<id>copy-test-to-classes</id>
 								<phase>process-test-classes</phase>
 								<goals>
@@ -460,155 +397,5 @@
 				</plugins>
 			</build>
 		</profile>
-
-		<!-- build war -->
-		<profile>
-			<id>war</id>
-			<build>
-				<finalName>leaflet4vaadin-demo</finalName>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-test-libs</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/test-libs</outputDirectory>
-									<includeScope>test</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>${maven-war-plugin.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>war</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<archive>
-								<index>true</index>
-								<manifest>
-									<addClasspath>false</addClasspath>
-									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-								</manifest>
-								<manifestEntries>
-									<Vaadin-Package-Version>1</Vaadin-Package-Version>
-								</manifestEntries>
-							</archive>
-							<failOnMissingWebXml>false</failOnMissingWebXml>
-							<archiveClasses>false</archiveClasses>
-							<webResources>
-								<resource>
-									<directory>${basedir}/src/test/resources</directory>
-									<targetPath>WEB-INF/classes</targetPath>
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/classes/META-INF/VAADIN</directory>
-									<targetPath>WEB-INF/classes/META-INF/VAADIN</targetPath>
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/test-classes</directory>
-									<targetPath>WEB-INF/classes</targetPath>
-								</resource>
-								<resource>
-									<directory>${project.build.directory}/test-libs</directory>
-									<targetPath>WEB-INF/lib</targetPath>
-								</resource>
-							</webResources>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Heroku profile -->
-		<profile>
-			<id>heroku</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.eirslett</groupId>
-						<artifactId>frontend-maven-plugin</artifactId>
-						<version>1.9.1</version>
-						<executions>
-							<execution>
-								<id>install node and npm</id>
-								<goals>
-									<goal>install-node-and-npm</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<nodeVersion>v12.16.1</nodeVersion>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-webapp-runner</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>com.heroku</groupId>
-											<artifactId>webapp-runner</artifactId>
-											<version>${webapp-runner.version}</version>
-											<destFileName>webapp-runner.jar</destFileName>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>heroku-deploy</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.heroku.sdk</groupId>
-						<artifactId>heroku-maven-plugin</artifactId>
-						<version>${heroku-maven-plugin}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>deploy-war</goal>
-								</goals>
-								<phase>install</phase>
-							</execution>
-						</executions>
-						<configuration>
-							<appName>${project.artifactId}</appName>
-							<warFile>${project.build.directory}/leaflet4vaadin-demo.war</warFile>
-							<logProgress>true</logProgress>
-							<includeTarget>false</includeTarget>
-							<includes>
-								<include>${project.build.directory}/leaflet4vaadin-demo.war</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
 	</profiles>
 </project>

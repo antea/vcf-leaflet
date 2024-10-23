@@ -72,7 +72,7 @@ public class MultipleBaseLayersExample extends ExampleContainer {
         baseLayers.put("Mapnik map grayscale", grayscale);
 
         LayersControlOptions layerControlOptions = new LayersControlOptions();
-        layerControlOptions.setCollapsed(false);
+        layerControlOptions.setCollapsed(true);
         LayersControl layersControl = new LayersControl(baseLayers, Collections.emptyMap(), layerControlOptions);
         layersControl.addTo(leafletMap);
 
