@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.vaadin.addons.componentfactory</groupId>
+	<groupId>org.vaadin.addons.antea</groupId>
 	<artifactId>vcf-leaflet</artifactId>
 	<version>1.0.1.1-ANTEA-SNAPSHOT</version>
 	<name>Leaflet</name>
-	<description>Integration of Leaflet Map for Vaadin Flow</description>
+	<description>Integration of Leaflet Map for Vaadin Flow, Antea fork</description>
 	<scm>
-		<url>https://github.com/vaadin-component-factory/vcf-leaflet</url>
-		<connection>scm:git:git://https://github.com/vaadin-component-factory/vcf-leaflet.git</connection>
-		<developerConnection>scm:git:git@https://github.com/vaadin-component-factory/vcf-leaflet.git</developerConnection>
+		<url>https://github.com/antea/vcf-leaflet</url>
+		<connection>scm:git:git://https://github.com/antea/vcf-leaflet.git</connection>
+		<developerConnection>scm:git:git@https://github.com/antea/vcf-leaflet.git</developerConnection>
 	</scm>
 	<properties>
 		<vaadin.version>14.10.11</vaadin.version>
 
 		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compilecr.target>1.8</maven.compilecr.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -50,6 +50,14 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<distributionManagement>
+		<!-- This is the Antea repository hosted in GCP Artifact Registry. -->
+		<repository>
+			<id>artifactregistry</id>
+			<url>artifactregistry://europe-west12-maven.pkg.dev/bbox-394507/maven-repo</url>
+		</repository>
+	</distributionManagement>
 
 	<repositories>
 		<repository>
@@ -296,7 +304,7 @@
 						</executions>
 						<configuration>
 							<quiet>true</quiet>
-							<additionalparam>-Xdoclint:none</additionalparam>
+							<doclint>all,-missing</doclint>
 						</configuration>
 					</plugin>
 					<plugin>
