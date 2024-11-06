@@ -41,7 +41,9 @@ public class MarkerDivIconExample extends ExampleContainer {
 		leafletMap.setBaseUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
 
 		Marker marker = new Marker(options.getCenter());
-		marker.setIcon(new DivIcon());
+		DivIcon icon = new DivIcon();
+		icon.setHtml("<img src=\"images/marker-icon-demo.png\" /><span>Hello I am a written text</span>");
+		marker.setIcon(icon);
 		marker.setDraggable(true);
 		marker.bindPopup("Hey, I'm a DivIcon, drag me if you want");
 		marker.onClick((e) -> {
