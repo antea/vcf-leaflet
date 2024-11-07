@@ -140,7 +140,8 @@ export class LeafletTypeConverter {
       Object.keys(object).forEach((key, index) => {
         if (this.isLeafletType(object[key])) {
           converted[key] = this.convert(object[key], map);
-        }
+        } else if (key.endsWith("Function") && object[key])
+          converted[key] = eval("(" + object[key] + ")");
       });
     }
 

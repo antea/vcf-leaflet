@@ -15,6 +15,9 @@
 package org.vaadin.addons.componentfactory.leaflet.plugins.markercluster;
 
 import java.io.Serializable;
+
+import lombok.Getter;
+import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.layer.vectors.PathOptions;
 
 /**
@@ -31,6 +34,8 @@ import org.vaadin.addons.componentfactory.leaflet.layer.vectors.PathOptions;
  * @version 1.0
  * @see MarkerClusterGroup
  */
+@Setter
+@Getter
 public class MarkerClusterOptions implements Serializable {
 
     /**
@@ -58,132 +63,5 @@ public class MarkerClusterOptions implements Serializable {
     private int chunkDelay = 50;
     private PathOptions polygonOptions;
 
-    public int getMaxClusterRadius() {
-        return maxClusterRadius;
-    }
-
-    public void setMaxClusterRadius(int maxClusterRadius) {
-        this.maxClusterRadius = maxClusterRadius;
-    }
-
-    public String getClusterPane() {
-        return clusterPane;
-    }
-
-    public void setClusterPane(String clusterPane) {
-        this.clusterPane = clusterPane;
-    }
-
-    public boolean isSpiderfyOnMaxZoom() {
-        return spiderfyOnMaxZoom;
-    }
-
-    public void setSpiderfyOnMaxZoom(boolean spiderfyOnMaxZoom) {
-        this.spiderfyOnMaxZoom = spiderfyOnMaxZoom;
-    }
-
-    public boolean isShowCoverageOnHover() {
-        return showCoverageOnHover;
-    }
-
-    public void setShowCoverageOnHover(boolean showCoverageOnHover) {
-        this.showCoverageOnHover = showCoverageOnHover;
-    }
-
-    public boolean isZoomToBoundsOnClick() {
-        return zoomToBoundsOnClick;
-    }
-
-    public void setZoomToBoundsOnClick(boolean zoomToBoundsOnClick) {
-        this.zoomToBoundsOnClick = zoomToBoundsOnClick;
-    }
-
-    public boolean isSingleMarkerMode() {
-        return singleMarkerMode;
-    }
-
-    public void setSingleMarkerMode(boolean singleMarkerMode) {
-        this.singleMarkerMode = singleMarkerMode;
-    }
-
-    public Integer getDisableClusteringAtZoom() {
-        return disableClusteringAtZoom;
-    }
-
-    public void setDisableClusteringAtZoom(Integer disableClusteringAtZoom) {
-        this.disableClusteringAtZoom = disableClusteringAtZoom;
-    }
-
-    public boolean isRemoveOutsideVisibleBounds() {
-        return removeOutsideVisibleBounds;
-    }
-
-    public void setRemoveOutsideVisibleBounds(boolean removeOutsideVisibleBounds) {
-        this.removeOutsideVisibleBounds = removeOutsideVisibleBounds;
-    }
-
-    public boolean isAnimate() {
-        return animate;
-    }
-
-    public void setAnimate(boolean animate) {
-        this.animate = animate;
-    }
-
-    public boolean isAnimateAddingMarkers() {
-        return animateAddingMarkers;
-    }
-
-    public void setAnimateAddingMarkers(boolean animateAddingMarkers) {
-        this.animateAddingMarkers = animateAddingMarkers;
-    }
-
-    public double getSpiderfyDistanceMultiplier() {
-        return spiderfyDistanceMultiplier;
-    }
-
-    public void setSpiderfyDistanceMultiplier(double spiderfyDistanceMultiplier) {
-        this.spiderfyDistanceMultiplier = spiderfyDistanceMultiplier;
-    }
-
-    public PathOptions getSpiderLegPolylineOptions() {
-        return spiderLegPolylineOptions;
-    }
-
-    public void setSpiderLegPolylineOptions(PathOptions spiderLegPolylineOptions) {
-        this.spiderLegPolylineOptions = spiderLegPolylineOptions;
-    }
-
-    public boolean isChunkedLoading() {
-        return chunkedLoading;
-    }
-
-    public void setChunkedLoading(boolean chunkedLoading) {
-        this.chunkedLoading = chunkedLoading;
-    }
-
-    public int getChunkInterval() {
-        return chunkInterval;
-    }
-
-    public void setChunkInterval(int chunkInterval) {
-        this.chunkInterval = chunkInterval;
-    }
-
-    public int getChunkDelay() {
-        return chunkDelay;
-    }
-
-    public void setChunkDelay(int chunkDelay) {
-        this.chunkDelay = chunkDelay;
-    }
-
-    public PathOptions getPolygonOptions() {
-        return polygonOptions;
-    }
-
-    public void setPolygonOptions(PathOptions polygonOptions) {
-        this.polygonOptions = polygonOptions;
-    }
-
+    private String iconCreateFunction;
 }

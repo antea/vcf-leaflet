@@ -2,6 +2,10 @@ package org.vaadin.addons.componentfactory.leaflet.plugins.markercluster;
 
 import java.util.Collections;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.vaadin.addons.componentfactory.leaflet.annotations.LeafletArgument;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEvent;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEventListener;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.FeatureGroup;
@@ -32,12 +36,14 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 @JsModule("leaflet.markercluster/dist/leaflet.markercluster-src.js")
 @CssImport(value = "leaflet.markercluster/dist/MarkerCluster.css", themeFor = "leaflet-map")
 @CssImport(value = "leaflet.markercluster/dist/MarkerCluster.Default.css", themeFor = "leaflet-map")
+@Getter
+@Setter
 public class MarkerClusterGroup extends FeatureGroup {
 
     private static final long serialVersionUID = -5115086977059013434L;
-    
-    @JsonIgnore
-    private final MarkerClusterOptions options;
+
+    @LeafletArgument
+    private MarkerClusterOptions options;
 
     public MarkerClusterGroup() {
         this(new MarkerClusterOptions());
@@ -113,11 +119,7 @@ public class MarkerClusterGroup extends FeatureGroup {
     public void onUnspiderfied(LeafletEventListener<LeafletEvent> listener) {
         on(MarkerClusterEventType.unspiderfied, listener);
     }
-    
-    @Override
-    public List<String> getConstructorArgumentNames() {
-        return Collections.emptyList();
-    }
+
     
     @Override
     public String getPane() {

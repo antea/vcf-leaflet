@@ -50,7 +50,10 @@ public class MarkerClusterPluginExample extends ExampleContainer {
         leafletMap.setBaseUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
 
         MarkerClusterOptions options = new MarkerClusterOptions();
-        options.setShowCoverageOnHover(false);
+        options.setIconCreateFunction("function(cluster) { " +
+                    "return L.divIcon({ html: '<img src=\"images/marker-icon-demo.png\" /><span>' + cluster.getChildCount() + '</span>' });" +
+                "}");
+
         MarkerClusterGroup markerClusterGroup = new MarkerClusterGroup(options);
         markerClusterGroup.onClusterClick((e) -> Notification.show("You click the cluster", 1000, Position.TOP_CENTER));
 

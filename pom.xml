@@ -194,7 +194,7 @@
 				<artifactId>jetty-ee8-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
 				<configuration>
-					<scan>-1</scan>
+					<scan>2</scan>
 					<httpConnector>
 						<!--host>localhost</host-->
 						<port>8080</port>
