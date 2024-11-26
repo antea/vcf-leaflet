@@ -15,17 +15,19 @@
 package org.vaadin.addons.componentfactory.leaflet.layer.map.options;
 
 import java.util.UUID;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLngBounds;
 
 /**
  * Map options with leaflet default values
- * 
  * @author <strong>Gabor Kokeny</strong> Email:
- *         <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
- * 
- * @since 2020-03-06
+ * <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
  * @version 1.0
+ * @since 2020-03-06
  */
 public class DefaultMapOptions implements MapOptions {
 
@@ -56,6 +58,23 @@ public class DefaultMapOptions implements MapOptions {
     private Integer maxZoom = 20;
     private LatLngBounds maxBounds;
     private LatLngBounds bounds;
+    @Getter
+    private String crsName;
+
+    @Getter
+    private CustomSimpleCrs customSimpleCrs;
+
+    @Override
+    public void setCrsName(String crsName) {
+        this.crsName = crsName;
+        this.customSimpleCrs = null;
+    }
+
+    @Override
+    public void setCustomSimpleCrs(CustomSimpleCrs customSimpleCrs) {
+        this.customSimpleCrs = customSimpleCrs;
+        this.crsName = null;
+    }
 
     // Animation Options
     private boolean zoomAnimation = true;

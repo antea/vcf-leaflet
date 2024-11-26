@@ -251,4 +251,70 @@ export class LeafletTypeConverter {
       layer.bindPopup(leafletPopup);
     }
   }
+
+
+    /**
+     * This method trys to set the crs:
+     * it looks for the customCrs field in the map and uses is to add a new crs
+     * otherwise it looks for crsName, this one supports only the standard Crs ones.
+     * @param mapOptions the map options to create this map.
+     */
+    tryToSetCrs(mapOptions) {
+        if (mapOptions["customSimpleCrs"]) {
+            mapOptions.crs = this.addSimpleCustomCrs(mapOptions["customSimpleCrs"]);
+        } else {
+            switch (mapOptions["crsName"]) {
+                case "EPSG3395":
+                case "EPSG4326":
+                case "Simple":
+                    mapOptions.crs = this.L.CRS[mapOptions["crsName"]];
+            }
+        }
+        return mapOptions;
+
+    }
+
+    addSimpleCustomCrs(customCrs) {
+        return this.addCustomSimpleCrsFrom(customCrs.name, customCrs.min_x, customCrs.min_y, customCrs.max_x, customCrs.max_y,
+            customCrs.a, customCrs.b, customCrs.c, customCrs.d)
+    }
+    /**
+     * Adds a new Crs definition and makes it immediately available for use inside a Map. The
+     * new Crs extends Crs.Simple, uses a plat-carré projection with the
+     * extents given by the min_* and max_* parameters. For the meaning of the
+     * affine transform parameters, see: http://leafletjs.com/reference.html#transformation.
+     * @param name Name for the new Crs.
+     * @param min_x the min_x value
+     * @param min_y the min_y value
+     * @param max_x the max_x value
+     * @param max_y the max_y value
+     * @param a a in transformation calculation (a*x + b, c*y + d)
+     * @param b b in transformation calculation (a*x + b, c*y + d)
+     * @param c c in transformation calculation (a*x + b, c*y + d)
+     * @param d d in transformation calculation (a*x + b, c*y + d)
+     * @returns {*} a new Crs object, and add it to leaflet map
+     */
+    addCustomSimpleCrsFrom(name, min_x, min_y, max_x, max_y, a, b, c, d) {
+        let thisConverter = this
+        let projection = {
+            project: function (latlng) {
+                return new thisConverter.L.Point(latlng.lng, latlng.lat);
+            },
+            unproject: function (point) {
+                return new thisConverter.L.LatLng(point.y, point.x);
+            },
+            bounds: thisConverter.L.bounds([min_x, min_y], [max_x, max_y])
+        };
+
+        this.L.CRS[name] = this.L.extend({}, this.L.CRS, {
+            code: name,
+            projection: projection,
+            transformation: new this.L.Transformation(a, b, c, d),
+            distance: function (t, e) {
+                let i = e.lng - t.lng, n = e.lat - t.lat;
+                return Math.sqrt(i * i + n * n)
+            }
+        });
+        return this.L.CRS[name];
+    }
 }

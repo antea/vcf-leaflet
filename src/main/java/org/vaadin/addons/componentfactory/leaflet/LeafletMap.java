@@ -120,6 +120,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 
 @Tag("leaflet-map")
 @NpmPackage(value = "leaflet", version = "1.9.4")
@@ -142,11 +143,11 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     private boolean ready = false;
 
-    private Class<? extends MapOptions> optionsClass;
+    private final Class<? extends MapOptions> optionsClass;
     
-    private List<LeafletEventType> events = new ArrayList<>(); 
+    private final List<LeafletEventType> events = new ArrayList<>();
     
-    private List<Class<? extends LeafletEvent>> eventsClasses = Arrays.asList(AddEvent.class,
+    private final List<Class<? extends LeafletEvent>> eventsClasses = Arrays.asList(AddEvent.class,
         BaseLayerChangeEvent.class, DragEndEvent.class, DragEvent.class, ErrorEvent.class,
         KeyDownEvent.class, KeyPressEvent.class, KeyUpEvent.class, LayerAddEvent.class,
         LayerRemoveEvent.class, LoadEvent.class, LocationEvent.class, MouseClickEvent.class,
@@ -169,12 +170,27 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         getModel().setMapOptions(mapOptions);
         setSizeFull();
         registerListeners();
-    }  
+    }
+
+    public void setMapOptions(MapOptions mapOptions) {
+        getModel().setMapOptions(mapOptions);
+        invalidateSize();
+    }
+
+    /**
+     * Please, make sure to set the Crs before adding the Map to Vaadin Hierarchy.
+     * @param customSimpleCrs A new Crs
+     */
+    public void setCustomCrs(CustomSimpleCrs customSimpleCrs){
+        MapOptions mapOptions = getModel().getMapOptions();
+        mapOptions.setCustomSimpleCrs(customSimpleCrs);
+        setMapOptions(mapOptions);
+    }
     
     private LeafletModel getModel() {
         return new LeafletModel() {
 
-            ObjectMapper objectMapper = new ObjectMapper();            
+            final ObjectMapper objectMapper = new ObjectMapper();
                         
             @Override
             public MapOptions getMapOptions() {
@@ -229,9 +245,9 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     /**
      * Fires the given leaflet event
      * 
-     * @param layerId
+     * @param layer
      *            the layer where the event occurred
-     * @param eventType
+     * @param event
      *            the event object to be propagate
      * @see LeafletEvent
      */

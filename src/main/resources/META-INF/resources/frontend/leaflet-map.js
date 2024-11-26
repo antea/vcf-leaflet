@@ -17,17 +17,17 @@
  * limitations under the License.
  * #L%
  */
- 
+
 /* 
  * This file incorporates work licensed under the Apache License, Version 2.0
  * Copyright 2020 Gabor Kokeny and contributors
  */
 
-import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
-import { ThemableMixin } from "@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js";
+import {html, PolymerElement} from "@polymer/polymer/polymer-element.js";
+import {ThemableMixin} from "@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js";
 import * as L from "leaflet/dist/leaflet-src.js";
 
-import { LeafletTypeConverter } from "./leaflet-type-converter.js";
+import {LeafletTypeConverter} from "./leaflet-type-converter.js";
 
 class LeafletMap extends ThemableMixin(PolymerElement) {
   static get template() {
@@ -76,10 +76,10 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
 
     this.leafletConverter = new LeafletTypeConverter(L);
     // console.log("LeafletMap - ready() using converter", this.leafletConverter);
-
     // init leaflet map
-    let map = this.toLeafletMap(JSON.parse(this.mapOptions));
-    this.map = map;
+    let options = JSON.parse(this.mapOptions)
+    options = this.leafletConverter.tryToSetCrs(options)
+    this.map = this.toLeafletMap(options);
   }
 
   /**
@@ -181,6 +181,7 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     // console.log("LeafletMap - initialize map with options: {}", options);
     let mapElement = this.shadowRoot.getElementById("map");
     // console.log("LeafletMap - using DOM element: {}", mapElement);
+    console.log("With Options" + options)
     let leafletMap = L.map(mapElement, options);
     leafletMap._controls = [];
     this.events
