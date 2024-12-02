@@ -12,6 +12,7 @@ import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOp
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
 import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePosition;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePositionOptions;
 import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLngBounds;
@@ -38,7 +39,11 @@ public class MapCrsExample extends ExampleContainer {
         options.setCustomSimpleCrs(customSimpleCrs);
 
         LeafletMap leafletMap = new LeafletMap(options);
-        new MousePosition().addTo(leafletMap);
+
+        MousePositionOptions mousePositionOptions = new MousePositionOptions();
+        mousePositionOptions.setPrefix("Lat ");
+        mousePositionOptions.setSeparator(" : Lon ");
+        new MousePosition(mousePositionOptions).addTo(leafletMap);
         new ScaleControl().addTo(leafletMap);
         LayersControl layersControl = new LayersControl();
         layersControl.addTo(leafletMap);

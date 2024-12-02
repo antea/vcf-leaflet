@@ -5,6 +5,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import lombok.Getter;
 import lombok.Setter;
+import org.vaadin.addons.componentfactory.leaflet.annotations.LeafletArgument;
 import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
 
 /**
@@ -27,22 +28,15 @@ import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
 public class MousePosition extends LeafletControl {
     private static final String JAVASCRIPT_CLASS_NAME = "mousePosition";
 
-    // To separate longitude\latitude values. Defaults to ' : '
-    private String separator = ":";
+    @LeafletArgument
+    private MousePositionOptions options;
 
-    // Initial text to display. Defaults to 'Unavailable'
-    private String emptystring = "Unavailable";
-
-    //Number of digits. Defaults to 5
-    private int numDigits = 5;
-
-    // Weather to put the longitude first or not. Defaults to false
-    private Boolean lngFirst = false;
-
-    //A string to be prepended to the coordinates. Defaults to the empty string ‘’.
-    private String prefix = "";
+    public MousePosition(MousePositionOptions options) {
+        super(JAVASCRIPT_CLASS_NAME);
+        this.options = options;
+    }
 
     public MousePosition() {
-        super(JAVASCRIPT_CLASS_NAME);
+        this(new MousePositionOptions());
     }
 }
