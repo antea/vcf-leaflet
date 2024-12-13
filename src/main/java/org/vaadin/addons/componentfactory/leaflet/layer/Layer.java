@@ -24,6 +24,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import lombok.Getter;
+import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.LeafletObject;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.Evented;
@@ -35,6 +38,7 @@ import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEven
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.PopupEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.TooltipEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.ExecutableFunctions;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.popup.Popup;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.tooltip.Tooltip;
 
@@ -55,13 +59,22 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         add, remove;
     }
 
-    private transient final Map<LeafletEventType, Set<LeafletEventListener>> eventListeners = new HashMap<>();
+    private transient final Map<LeafletEventType, Set<LeafletEventListener<? extends LeafletEvent>>> eventListeners = new HashMap<>();
 
     public static final String DEFAULT_PANE = "overlayPane";
+    @Setter
+    @Getter
     private String pane = DEFAULT_PANE;
+    @Setter
+    @Getter
     private String attribution;
     private Popup popup;
+    @Getter
     private Tooltip tooltip;
+    /**
+     * Event types managed by this layer
+     */
+    @Getter
     private List<String> events = new ArrayList<>();
 
     protected Layer() {
@@ -143,9 +156,10 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
     public <T extends LeafletEvent> void fireEvent(T leafletEvent) {
         Optional<LeafletEventType> event = eventListeners.keySet().stream().filter(type -> type.equals(leafletEvent.getType())).findFirst();
 
-        if (event.isPresent()) {
-            eventListeners.get(event.get()).forEach(listener -> listener.handleEvent(leafletEvent));
-        }
+        event.ifPresent(leafletEventType ->
+                eventListeners.get(leafletEventType)
+                        .forEach(listener ->
+                                ((LeafletEventListener<T>)listener).handleEvent(leafletEvent)));
     }
 
     /**
@@ -170,26 +184,6 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         leafletMap.addLayer(this);
     }
 
-    public List<String> getEvents() {
-        return this.events;
-    }
-
-    public String getAttribution() {
-        return this.attribution;
-    }
-
-    public void setAttribution(String attribution) {
-        this.attribution = attribution;
-    }
-
-    public String getPane() {
-        return this.pane;
-    }
-
-    public void setPane(String pane) {
-        this.pane = pane;
-    }
-
     @Override
     public Popup getPopup() {
         return this.popup;
@@ -204,10 +198,6 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         this.popup = popup;
     }
 
-    public Tooltip getTooltip() {
-        return this.tooltip;
-    }
-
     public void bindTooltip(String tooltipContent) {
         bindTooltip(new Tooltip(tooltipContent));
     }
@@ -219,21 +209,41 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     public <T> void set(Supplier<CompletableFuture<T>> futureResult, Consumer<T> handler) {
         if (futureResult.get() != null) {
-            futureResult.get().thenAccept((result) -> handler.accept(result));
+            futureResult.get().thenAccept(handler);
         }
     }
 
     @Override
     public <T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener) {
         if (!events.contains(eventType.getLeafletEvent())) {
+            // if parent is already set, this layer was already added to the map, and the map did not register a
+            // listener for these kind of events, so now we tell the map to start listening for them
+            if (getParent() != null) {
+                findLeafletMap(this)
+                        .ifPresent(map ->
+                                map.executeJs("registerEventListener", Layer.this, eventType.getLeafletEvent()));
+            }
             events.add(eventType.getLeafletEvent());
         }
-        Set<LeafletEventListener> listeners = eventListeners.get(eventType);
+        Set<LeafletEventListener<?>> listeners = eventListeners.get(eventType);
         if (listeners == null) {
             listeners = new HashSet<>();
             eventListeners.putIfAbsent(eventType, listeners);
         }
         listeners.add(listener);
+    }
+
+    @Override
+    public boolean removeEventListener(LeafletEventType eventType, LeafletEventListener<?> listener){
+        Set<LeafletEventListener<?>> listeners = this.eventListeners.get(eventType);
+        if (listeners != null) {
+            boolean remove = listeners.remove(listener);
+            if (listeners.isEmpty()) {
+                removeEventListener(eventType);
+            }
+            return remove;
+        }
+        return false;
     }
 
     @Override
@@ -245,8 +255,8 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     @Override
     public boolean hasEventListeners(LeafletEventType eventType) {
-        Set<LeafletEventListener> listeners = this.eventListeners.get(eventType);
-        return listeners != null && listeners.size() > 0;
+        Set<LeafletEventListener<?>> listeners = this.eventListeners.get(eventType);
+        return listeners != null && !listeners.isEmpty();
     }
 
     @Override
@@ -266,6 +276,22 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         } else if (getParent() instanceof LayerGroup) {
             LayerGroup parentLayerGroup = (LayerGroup) getParent();
             parentLayerGroup.removeLayer(this);
+        }
+    }
+
+    private Optional<LeafletMap> findLeafletMap(Layer layer) {
+        ExecutableFunctions parent = layer.getParent();
+        if (parent instanceof LeafletMap) {
+            return Optional.of((LeafletMap) parent);
+        } else if (parent instanceof LayerGroup) {
+            LayerGroup parentLayerGroup = (LayerGroup) parent;
+            return parentLayerGroup.getLayers().stream()
+                    .map(this::findLeafletMap)
+                    .filter(Optional::isPresent)
+                    .findFirst()
+                    .orElse(Optional.empty());
+        } else {
+            return Optional.empty();
         }
     }
 

@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@
  * #L%
  */
 
-/* 
+/*
  * This file incorporates work licensed under the Apache License, Version 2.0
  * Copyright 2020 Gabor Kokeny and contributors
  */
@@ -110,14 +110,17 @@ import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonType;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
@@ -144,21 +147,21 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     private boolean ready = false;
 
     private final Class<? extends MapOptions> optionsClass;
-    
+
     private final List<LeafletEventType> events = new ArrayList<>();
-    
+
     private final List<Class<? extends LeafletEvent>> eventsClasses = Arrays.asList(AddEvent.class,
-        BaseLayerChangeEvent.class, DragEndEvent.class, DragEvent.class, ErrorEvent.class,
-        KeyDownEvent.class, KeyPressEvent.class, KeyUpEvent.class, LayerAddEvent.class,
-        LayerRemoveEvent.class, LoadEvent.class, LocationEvent.class, MouseClickEvent.class,
-        MouseContextMenuEvent.class, MouseDoubleClickEvent.class, MouseDownEvent.class,
-        MouseMoveEvent.class, MouseOutEvent.class, MouseOverEvent.class, MousePreClickEvent.class,
-        MouseUpEvent.class, MoveEndEvent.class, MoveStartEvent.class, OverlayAddEvent.class,
-        OverlayRemoveEvent.class, PopupCloseEvent.class, PopupOpenEvent.class, RemoveEvent.class,
-        ResizeEvent.class, TileErrorEvent.class, TileLoadEvent.class, TileUnloadEvent.class,
-        TileLoadStartEvent.class, TooltipCloseEvent.class, TooltipOpenEvent.class,
-        UnloadEvent.class, ViewResetEvent.class, ZoomAnimEvent.class, ZoomEndEvent.class,
-        ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class);
+            BaseLayerChangeEvent.class, DragEndEvent.class, DragEvent.class, ErrorEvent.class,
+            KeyDownEvent.class, KeyPressEvent.class, KeyUpEvent.class, LayerAddEvent.class,
+            LayerRemoveEvent.class, LoadEvent.class, LocationEvent.class, MouseClickEvent.class,
+            MouseContextMenuEvent.class, MouseDoubleClickEvent.class, MouseDownEvent.class,
+            MouseMoveEvent.class, MouseOutEvent.class, MouseOverEvent.class, MousePreClickEvent.class,
+            MouseUpEvent.class, MoveEndEvent.class, MoveStartEvent.class, OverlayAddEvent.class,
+            OverlayRemoveEvent.class, PopupCloseEvent.class, PopupOpenEvent.class, RemoveEvent.class,
+            ResizeEvent.class, TileErrorEvent.class, TileLoadEvent.class, TileUnloadEvent.class,
+            TileLoadStartEvent.class, TooltipCloseEvent.class, TooltipOpenEvent.class,
+            UnloadEvent.class, ViewResetEvent.class, ZoomAnimEvent.class, ZoomEndEvent.class,
+            ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class);
 
     public LeafletMap() {
         this(new DefaultMapOptions());
@@ -181,17 +184,17 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
      * Please, make sure to set the Crs before adding the Map to Vaadin Hierarchy.
      * @param customSimpleCrs A new Crs
      */
-    public void setCustomCrs(CustomSimpleCrs customSimpleCrs){
+    public void setCustomCrs(CustomSimpleCrs customSimpleCrs) {
         MapOptions mapOptions = getModel().getMapOptions();
         mapOptions.setCustomSimpleCrs(customSimpleCrs);
         setMapOptions(mapOptions);
     }
-    
+
     private LeafletModel getModel() {
         return new LeafletModel() {
 
             final ObjectMapper objectMapper = new ObjectMapper();
-                        
+
             @Override
             public MapOptions getMapOptions() {
                 try {
@@ -206,49 +209,46 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
             @Override
             public void setMapOptions(MapOptions mapOptions) {
-                try {                    
+                try {
                     getElement().setProperty("mapOptions", objectMapper.writeValueAsString(mapOptions));
                 } catch (JsonProcessingException e) {
                     logger.error("Error serializing map options", e);
                 }
             }
-            
+
             @Override
             public List<LeafletEventType> getEvents() {
                 return events;
-            }            
+            }
         };
     }
-    
+
     private void registerListeners() {
-      eventsClasses.forEach(c -> {
-        addListener(c, e -> {
-          Layer layer = findLayer(e.getLayerId());
-          this.fireEvent(layer, e);
+        eventsClasses.forEach(c -> {
+            addListener(c, e -> {
+                Layer layer = findLayer(e.getLayerId());
+                this.fireEvent(layer, e);
+            });
         });
-      });
     }
-    
+
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-      super.onAttach(attachEvent);
+        super.onAttach(attachEvent);
         // set events to leaflet 
         JsonArray jsonArray = Json.createArray();
         for (int i = 0; i < events.size(); i++) {
-          JsonObject js = Json.createObject();
-          js.put("leafletEvent", events.get(i).name());
-          jsonArray.set(i, js);
-        }   
-        this.getElement().setPropertyJson("events", jsonArray);        
+            JsonObject js = Json.createObject();
+            js.put("leafletEvent", events.get(i).name());
+            jsonArray.set(i, js);
+        }
+        this.getElement().setPropertyJson("events", jsonArray);
     }
 
     /**
      * Fires the given leaflet event
-     * 
-     * @param layer
-     *            the layer where the event occurred
-     * @param event
-     *            the event object to be propagate
+     * @param layer the layer where the event occurred
+     * @param event the event object to be propagate
      * @see LeafletEvent
      */
     private void fireEvent(Layer layer, LeafletEvent event) {
@@ -259,9 +259,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Returns the layer with the given internal ID.
-     * 
-     * @param layerId
-     *            the id of the layer to be looking for
+     * @param layerId the id of the layer to be looking for
      * @return the layer with the given internal ID
      */
     public Layer getLayer(String layerId) {
@@ -274,9 +272,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Adds the given layer to the map
-     * 
-     * @param layer
-     *            the layer to add
+     * @param layer the layer to add
      */
     public void addLayer(Layer layer) {
         logger.debug("add layer: {}", layer);
@@ -286,9 +282,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Removes the given layer from the map.
-     * 
-     * @param layer
-     *            the layer to remove
+     * @param layer the layer to remove
      */
     public void removeLayer(Layer layer) {
         logger.debug("remove layer: {}", layer.getUuid());
@@ -302,9 +296,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Adds the given control to the map
-     * 
-     * @param leafletControl
-     *            the control to add
+     * @param leafletControl the control to add
      */
     public void addControl(LeafletControl leafletControl) {
         executeJs("addControl", leafletControl);
@@ -312,9 +304,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Removes the given control from the map
-     * 
-     * @param leafletControl
-     *            the control to remove
+     * @param leafletControl the control to remove
      */
     public void removeControl(LeafletControl leafletControl) {
         executeJs("removeControl", leafletControl);
@@ -323,9 +313,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     /**
      * Fired when the map gets initialized with a view (center and zoom) and at
      * least one layer, or immediately if it's already initialized.
-     * 
-     * @param listener
-     *            the listener to call when the event occurs, not {@code null}
+     * @param listener the listener to call when the event occurs, not {@code null}
      * @return a handle that can be used for removing the listener
      */
     public Registration whenReady(ComponentEventListener<MapReadyEvent> listener) {
@@ -344,9 +332,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Adds theme variants to the map component.
-     *
-     * @param variants
-     *            theme variants to add
+     * @param variants theme variants to add
      */
     public void addThemeVariants(LeafletMapVariant... variants) {
         getThemeNames().addAll(Stream.of(variants).map(LeafletMapVariant::getVariantName).collect(Collectors.toList()));
@@ -376,8 +362,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
                     if (type.equals(JsonType.OBJECT)) {
                         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                         result = objectMapper.readValue(value.toString(), resultType);
-                    }
-                    else {
+                    } else {
                         result = objectMapper.readValue(value.asString(), resultType);
                     }
                     completableFuture.complete(result);
@@ -398,6 +383,15 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     public <T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener) {
         this.mapLayer.addEventListener(eventType, listener);
         this.getModel().getEvents().add(eventType);
+    }
+
+    @Override
+    public boolean removeEventListener(LeafletEventType eventType, LeafletEventListener<?> listener) {
+        boolean result = this.mapLayer.removeEventListener(eventType, listener);
+        if (result && this.mapLayer.hasEventListeners(eventType)) {
+            this.getModel().getEvents().remove(eventType);
+        }
+        return result;
     }
 
     @Override
@@ -431,11 +425,10 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     /**
      * Map event which fired when map gets initialized on client side
-     * 
      * @author <strong>Gabor Kokeny</strong> Email:
-     *         <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
-     * @since 2020-03-16
+     * <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
      * @version 1.0
+     * @since 2020-03-16
      */
     public static final class MapReadyEvent extends ComponentEvent<LeafletMap> {
 
@@ -444,6 +437,5 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         public MapReadyEvent(LeafletMap source) {
             super(source, true);
         }
-
     }
 }

@@ -118,12 +118,17 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     let leafletFn = target[operation.functionName];
     // console.log("LeafletMap - callLeafletFunction() - leafletFn", leafletFn);
 
+    // we want to call registerEventListener, that is a function of this file, not a function on leaflet Map object
+    if (!leafletFn && "registerEventListener" === operation.functionName) {
+        this.registerEventListener(leafletArgs[0], leafletArgs[1]);
+    }
+
     if(leafletFn){
       let result = leafletFn.apply(target, leafletArgs);
       // console.log("LeafletMap - callLeafletFunction() - result", result);
       return result;
-    } 
-    
+    }
+
     return;
   }
 
@@ -280,11 +285,11 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   }
 
   onMouseEventEventHandler(event) {
-    console.info("LeafletMap - onMouseEventEventHandler()", event);    
+    console.info("LeafletMap - onMouseEventEventHandler()", event);
     this.dispatchEvent( new CustomEvent("leaflet-"+ event.type, { detail: event }));
   }
   onKeyboardEventHandler(event) {
-    console.info("LeafletMap - onKeyboardEventHandler()", event);    
+    console.info("LeafletMap - onKeyboardEventHandler()", event);
     this.dispatchEvent( new CustomEvent("leaflet-"+ event.type, { detail: event }));
   }
   onResizeEventHandler(event) {

@@ -47,6 +47,8 @@ public interface Evented {
 	 */
 	<T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener);
 
+	boolean removeEventListener(LeafletEventType eventType, LeafletEventListener<?> listener);
+
 	/**
 	 * Alias to addEventListener(…)
 	 * 
