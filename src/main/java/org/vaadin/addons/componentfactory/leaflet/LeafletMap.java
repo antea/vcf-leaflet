@@ -27,78 +27,7 @@ package org.vaadin.addons.componentfactory.leaflet;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
-import org.vaadin.addons.componentfactory.leaflet.layer.Identifiable;
-import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.AddEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.BaseLayerChangeEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.DragEndEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.DragEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ErrorEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyDownEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyPressEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyUpEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LayerAddEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LayerRemoveEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEventListener;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LoadEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LocationEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseClickEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseContextMenuEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseDoubleClickEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseDownEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseMoveEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseOutEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseOverEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MousePreClickEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseUpEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MoveEndEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.MoveStartEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.OverlayAddEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.OverlayRemoveEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.PopupCloseEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.PopupOpenEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.RemoveEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ResizeEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TileErrorEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TileLoadEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TileLoadStartEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TileUnloadEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TooltipCloseEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TooltipOpenEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.UnloadEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ViewResetEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ZoomAnimEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ZoomEndEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ZoomEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ZoomLevelsChangeEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ZoomStartEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.SupportsKeyboardEvents;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.SupportsLayerEvents;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.SupportsLocationEvents;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.SupportsMapEvents;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.SupportsMouseEvents;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
-import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.GeolocationFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapConversionFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapGetStateFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapModifyStateFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
-import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
-import org.vaadin.addons.componentfactory.leaflet.operations.LeafletOperation;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ClientCallable;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.HasTheme;
-import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
@@ -110,27 +39,45 @@ import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
+import org.vaadin.addons.componentfactory.leaflet.layer.Identifiable;
+import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyDownEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyPressEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyUpEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.*;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
+import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.GeolocationFunctions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapConversionFunctions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapGetStateFunctions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapModifyStateFunctions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
+import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
+import org.vaadin.addons.componentfactory.leaflet.operations.LeafletOperation;
+import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
-
 @Tag("leaflet-map")
 @NpmPackage(value = "leaflet", version = "1.9.4")
-@JsModule("./leaflet-map.js")
 @JsModule("leaflet/dist/leaflet-src.js")
+@JsModule("./leaflet-map.js")
 @CssImport(value = "leaflet/dist/leaflet.css", themeFor = "leaflet-map")
+@CssImport(value = "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css", themeFor = "leaflet-map")
 @CssImport(value = "./styles/leaflet-lumo-theme.css", themeFor = "leaflet-map")
+@NpmPackage(value="@geoman-io/leaflet-geoman-free", version = "2.14.2")
 public final class LeafletMap extends Component implements MapModifyStateFunctions, MapGetStateFunctions, GeolocationFunctions, MapConversionFunctions, SupportsMouseEvents,
         SupportsMapEvents, SupportsLocationEvents, SupportsKeyboardEvents, SupportsLayerEvents, HasSize, HasTheme, HasStyle {
 

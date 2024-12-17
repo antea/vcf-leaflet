@@ -1,4 +1,4 @@
-package org.vaadin.addons.componentfactory.leaflet.demo.view.map;
+package org.vaadin.addons.componentfactory.leaflet.demo.view.plugins;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -10,17 +10,17 @@ import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.marker.Marker;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanControlOptions;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanUtils;
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 
 import static java.util.stream.IntStream.range;
+import static org.vaadin.addons.componentfactory.leaflet.types.Icon.DEFAULT_ICON;
 import static org.vaadin.addons.componentfactory.leaflet.types.LatLng.latlng;
 
-@PageTitle("Multiple maps")
-@Route(value = "map/multiple", layout = LeafletDemoApp.class)
-public class MultipleMapsExample extends ExampleContainer {
-
-    private static Icon CUSTOM_ICON = new Icon("images/marker-icon-demo.png", 41);
-
+@PageTitle("Editable map")
+@Route(value = "plugin/geoman", layout = LeafletDemoApp.class)
+public class GeomanEditMapPluginExample extends ExampleContainer {
     @Override
     protected void initDemo() {
         MapOptions options = new DefaultMapOptions();
@@ -28,19 +28,22 @@ public class MultipleMapsExample extends ExampleContainer {
         options.setZoom(7);
         options.setPreferCanvas(true);
 
-
-        LeafletMap leafletMapLeft = new LeafletMap(options);
-        leafletMapLeft.setBaseUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-        leafletMapLeft.addLayer(createRandomMarkers(Icon.DEFAULT_ICON, 30));
-
         LeafletMap leafletMapRight = new LeafletMap(options);
         leafletMapRight.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
-        leafletMapRight.addLayer(createRandomMarkers(CUSTOM_ICON, 30));
+        leafletMapRight.addLayer(createRandomMarkers(DEFAULT_ICON, 30));
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSizeFull();
-        horizontalLayout.add(leafletMapLeft, leafletMapRight);
+        horizontalLayout.add(leafletMapRight);
         addToContent(horizontalLayout);
+
+        GeomanControlOptions geomanControlOptions = new GeomanControlOptions();
+        geomanControlOptions.setCutPolygon(false);
+        geomanControlOptions.setDrawPolygon(false);
+        geomanControlOptions.setDrawCircle(false);
+        GeomanUtils.addControls(leafletMapRight, geomanControlOptions);
+
+
     }
 
     private LayerGroup createRandomMarkers(Icon icon, int limit) {

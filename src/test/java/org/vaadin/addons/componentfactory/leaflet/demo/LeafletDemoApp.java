@@ -37,10 +37,7 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenu;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenuItem;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.ControlPositionExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.LayersControlExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.RemoveDefaultControlsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.ScaleControlExample;
+import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.*;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.layers.MultipleBaseLayersExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.map.*;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.DivOverlayStyleExample;
@@ -59,13 +56,7 @@ import org.vaadin.addons.componentfactory.leaflet.demo.view.path.Paths3000Exampl
 import org.vaadin.addons.componentfactory.leaflet.demo.view.path.PathsEventPropagationExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.path.PathsStyleExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.path.TypeOfPathsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.DynamicMapLayerPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.FullScreenPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.HeatmapPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.KmzLayerPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.MarkerClusterPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.TiledMapLayerPluginExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.VectorBasemapLayerPluginExample;
+import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.*;
 
 @CssImport(value = "styles/demo-applayout.css", themeFor = "vaadin-app-layout")
 public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver {
@@ -148,6 +139,8 @@ public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver
                 .addSubMenu(DynamicMapLayerPluginExample.class)
                 .addSubMenu(TiledMapLayerPluginExample.class)
                 .addSubMenu(VectorBasemapLayerPluginExample.class)
+                .addSubMenu(PrintControlExample.class)
+                .addSubMenu(GeomanEditMapPluginExample.class)
                 .addTo(appMenu);
 
         addToDrawer(appMenu);

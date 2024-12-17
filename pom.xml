@@ -182,7 +182,9 @@
 				<executions>
 					<execution>
 						<goals>
+							<!-- https://vaadin.com/docs/latest/flow/production/production-build#prepare-frontend -->
 							<goal>prepare-frontend</goal>
+						  	<!--goal>build-frontend</goal-->
 						</goals>
 					</execution>
 				</executions>

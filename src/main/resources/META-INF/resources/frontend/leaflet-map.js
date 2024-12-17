@@ -25,7 +25,13 @@
 
 import {html, PolymerElement} from "@polymer/polymer/polymer-element.js";
 import {ThemableMixin} from "@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js";
-import * as L from "leaflet/dist/leaflet-src.js";
+import './leaflet-base.js';
+import './leaflet-more.js'
+// https://github.com/geoman-io/leaflet-geoman/issues/1339
+export default globalThis.L;
+
+// import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.js"; for geoman > 1.15
+import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.min.js";
 
 import {LeafletTypeConverter} from "./leaflet-type-converter.js";
 
@@ -118,18 +124,24 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     let leafletFn = target[operation.functionName];
     // console.log("LeafletMap - callLeafletFunction() - leafletFn", leafletFn);
 
-    // we want to call registerEventListener, that is a function of this file, not a function on leaflet Map object
-    if (!leafletFn && "registerEventListener" === operation.functionName) {
-        this.registerEventListener(leafletArgs[0], leafletArgs[1]);
-    }
-
-    if(leafletFn){
+    if (leafletFn) {
       let result = leafletFn.apply(target, leafletArgs);
       // console.log("LeafletMap - callLeafletFunction() - result", result);
       return result;
+    } else if ("registerEventListener" === operation.functionName) {
+      // we want to call registerEventListener, that is a function of this file, not a function on leaflet Map object
+      this.registerEventListener(leafletArgs[0], leafletArgs[1]);
+    } else if (operation.functionName.startsWith("pm")) {
+      this._callPMFunction(operation.functionName, leafletArgs);
     }
+  }
 
-    return;
+  _callPMFunction(functionName, leafletArgs) {
+    L.PM.reInitLayer(this.map);
+    let pmFn = this.map.pm[functionName.replace("pm.", "")]
+    if (pmFn) {
+      pmFn.call(this.map.pm, leafletArgs[0]);
+    }
   }
 
   _findTargetLayer(operation) {
