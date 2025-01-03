@@ -110,6 +110,32 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     }
   }
 
+  /**
+   * this will call a specific function operation.functionName found here
+   */
+  callGeneralLeafletFunction(operation) {
+    let target = this._findTargetLayer(operation);
+
+    let leafletArgs = JSON.parse(operation.arguments);
+    leafletArgs = leafletArgs.map((arg) =>
+        this.leafletConverter.convert(arg, this)
+    );
+    let leafletGeneralFn = this[operation.functionName];
+    if (leafletGeneralFn) {
+      return leafletGeneralFn.apply(this, [target, leafletArgs]);
+    }
+  }
+
+  /**
+   * We need this method to keep in sync the uuid assigned by the server to all new layers
+   */
+  setUuid(layer, args) {
+    layer.options["uuid"] = args[0] ;
+  }
+
+  /**
+   * this will call a specific function operation.functionName invoking it on the layer  operation.layerId
+   */
   callLeafletFunction(operation) {
     // console.info("LeafletMap - callLeafletFunction()", operation);
 
@@ -291,6 +317,10 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
           events: ["tileerror", "tileload", "tileloadstart", "tileunload"],
           handler: this.onTileEventHandler,
         },
+        {
+          events: ["pm:create", "pm:remove", "pm:change", "pm:drag"],
+          handler: this.onGeomanEventHandler,
+        },
       ];
     }
     return this.eventMap;
@@ -350,6 +380,10 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   }
   onTileEventHandler(event) {
     console.info("LeafletMap - onTileEventHandler()", event);
+    this.dispatchEvent( new CustomEvent(event.type, { detail: event }));
+  }
+  onGeomanEventHandler(event) {
+    console.info("LeafletMap - onGeomanEventHandler()", event);
     this.dispatchEvent( new CustomEvent(event.type, { detail: event }));
   }
 }

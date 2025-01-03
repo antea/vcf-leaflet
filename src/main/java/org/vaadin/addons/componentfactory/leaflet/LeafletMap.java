@@ -59,6 +59,12 @@ import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOp
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
 import org.vaadin.addons.componentfactory.leaflet.operations.LeafletOperation;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerAddEvent;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerChangeEvent;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerRemoveEvent;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.supports.SupportsClientCreateEvents;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.supports.SupportsClientRemoveEvents;
 import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 
 import java.io.IOException;
@@ -77,9 +83,10 @@ import java.util.stream.Stream;
 @CssImport(value = "leaflet/dist/leaflet.css", themeFor = "leaflet-map")
 @CssImport(value = "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css", themeFor = "leaflet-map")
 @CssImport(value = "./styles/leaflet-lumo-theme.css", themeFor = "leaflet-map")
-@NpmPackage(value="@geoman-io/leaflet-geoman-free", version = "2.14.2")
+@NpmPackage(value = "@geoman-io/leaflet-geoman-free", version = "2.14.2")
 public final class LeafletMap extends Component implements MapModifyStateFunctions, MapGetStateFunctions, GeolocationFunctions, MapConversionFunctions, SupportsMouseEvents,
-        SupportsMapEvents, SupportsLocationEvents, SupportsKeyboardEvents, SupportsLayerEvents, HasSize, HasTheme, HasStyle {
+        SupportsMapEvents, SupportsLocationEvents, SupportsKeyboardEvents, SupportsLayerEvents,
+        SupportsClientRemoveEvents, SupportsClientCreateEvents, HasSize, HasTheme, HasStyle {
 
     private static final long serialVersionUID = 3789693345308589828L;
 
@@ -108,7 +115,9 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
             ResizeEvent.class, TileErrorEvent.class, TileLoadEvent.class, TileUnloadEvent.class,
             TileLoadStartEvent.class, TooltipCloseEvent.class, TooltipOpenEvent.class,
             UnloadEvent.class, ViewResetEvent.class, ZoomAnimEvent.class, ZoomEndEvent.class,
-            ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class);
+            ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class,
+            // Geoman events:
+            ClientLayerAddEvent.class, ClientLayerRemoveEvent.class, ClientLayerChangeEvent.class);
 
     public LeafletMap() {
         this(new DefaultMapOptions());
@@ -174,6 +183,29 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         eventsClasses.forEach(c -> {
             addListener(c, e -> {
                 Layer layer = findLayer(e.getLayerId());
+
+                // if the layer was created by geoman, we fire also a layerAdd event with the new layer
+                if (e instanceof ClientLayerAddEvent) {
+                    ClientLayerAddEvent clientLayerAddEvent = (ClientLayerAddEvent) e;
+                    LayerAddEvent layerAddEvent = new LayerAddEvent(clientLayerAddEvent.getSource(), true,
+                            clientLayerAddEvent.getLayerId(), clientLayerAddEvent.getNewLayerId());
+
+                    Layer child = GeomanUtils.syncCreatedLayer(clientLayerAddEvent, layer);
+                    layerAddEvent.setChild(child);
+                    clientLayerAddEvent.setChild(child);
+
+                    this.fireEvent(layer, e);
+                    // Here we raise also the normal LayerAddEvent
+                    this.fireEvent(layer, layerAddEvent);
+                    return;
+                } else if (e instanceof ClientLayerRemoveEvent) {
+                    ClientLayerRemoveEvent clientLayerRemoveEvent = (ClientLayerRemoveEvent) e;
+                    Layer removedLayer = findLayer(clientLayerRemoveEvent.getRemovedLayerId());
+                    if (GeomanUtils.syncRemovedLayer(layer, removedLayer)) {
+                        this.fireEvent(layer, e);
+                        return;
+                    }
+                }
                 this.fireEvent(layer, e);
             });
         });
@@ -186,7 +218,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         JsonArray jsonArray = Json.createArray();
         for (int i = 0; i < events.size(); i++) {
             JsonObject js = Json.createObject();
-            js.put("leafletEvent", events.get(i).name());
+            js.put("leafletEvent", events.get(i).getLeafletEvent());
             jsonArray.set(i, js);
         }
         this.getElement().setPropertyJson("events", jsonArray);
@@ -283,6 +315,25 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
      */
     public void addThemeVariants(LeafletMapVariant... variants) {
         getThemeNames().addAll(Stream.of(variants).map(LeafletMapVariant::getVariantName).collect(Collectors.toList()));
+    }
+
+    /**
+     * Here we invoke a specific function defined in leaflet-map.js passing as parameters an array containing target and
+     * arguments: {@code functionName([target, args])}
+     *
+     * <p>
+     * Instead, with {@link #executeJs(Identifiable, String, Serializable...)} we invoke the function
+     * {@code functionName } on {@code target} with the passed arguments. So
+     * in the client we will execute {@code target.functionName(arguments)}
+     * </p>
+     * @param target The layer that we need as first parameter of functionName
+     * @param functionName
+     * @param arguments
+     */
+    public void executeGeneralJs(Identifiable target, String functionName, Serializable... arguments) {
+        logger.info("Execute leaflet general function: {}", functionName);
+        LeafletOperation leafletOperation = new LeafletOperation(target, functionName, arguments);
+        getElement().callJsFunction("callGeneralLeafletFunction", JsonSerializer.toJson(leafletOperation));
     }
 
     @Override
