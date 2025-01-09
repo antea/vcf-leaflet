@@ -16,10 +16,8 @@ package org.vaadin.addons.componentfactory.leaflet.layer.events.supports;
 
 import static org.vaadin.addons.componentfactory.leaflet.layer.events.types.LayerEventType.layeradd;
 import static org.vaadin.addons.componentfactory.leaflet.layer.events.types.LayerEventType.layerremove;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.ErrorEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.Evented;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEventListener;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LocationEvent;
+
+import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
 
 public interface SupportsLayerEvents extends Evented {
 
@@ -28,7 +26,7 @@ public interface SupportsLayerEvents extends Evented {
 	 * 
 	 * @param listener the listener to call when the event occurs, not {@code null}
 	 */
-	default void onLayerAdd(LeafletEventListener<ErrorEvent> listener) {
+	default void onLayerAdd(LeafletEventListener<LayerAddEvent> listener) {
 		on(layeradd, listener);
 	}
 
@@ -37,7 +35,7 @@ public interface SupportsLayerEvents extends Evented {
 	 * 
 	 * @param listener the listener to call when the event occurs, not {@code null}
 	 */
-	default void onLayerRemove(LeafletEventListener<LocationEvent> listener) {
+	default void onLayerRemove(LeafletEventListener<LayerRemoveEvent> listener) {
 		on(layerremove, listener);
 	}
 }

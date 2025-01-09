@@ -24,6 +24,8 @@
  */
 package org.vaadin.addons.componentfactory.leaflet.layer.events;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LayerEventType;
@@ -37,26 +39,25 @@ import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LayerEventT
  * @since 2020-03-14
  * @version 1.0
  */
+@Setter
+@Getter
 public abstract class LayerEvent extends LeafletEvent {
 
   private static final long serialVersionUID = 6978303855963077536L;
-  private Layer child;
+    /**
+     * -- GETTER --
+     *  The layer that was added or removed.
+     *
+     * @return the child
+     */
+    private Layer child;
 
   public LayerEvent(LeafletMap source, boolean fromClient, String layerId, LayerEventType eventType,
       Layer child) {
     super(source, fromClient, layerId, eventType);
   }
 
-  /**
-   * The layer that was added or removed.
-   * 
-   * @return the child
-   */
-  public Layer getChild() {
-    return child;
-  }
-
-  @Override
+    @Override
   public String toString() {
     return "LayerEvent [type=" + super.getType() + ", child=" + child + "]";
   }
