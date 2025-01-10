@@ -3,6 +3,7 @@ package org.vaadin.addons.componentfactory.leaflet.plugins.geoman;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
+import org.vaadin.addons.componentfactory.leaflet.layer.groups.FeatureGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.ExecutableFunctions;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.marker.Marker;
@@ -12,6 +13,7 @@ import org.vaadin.addons.componentfactory.leaflet.layer.vectors.Rectangle;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerAddEvent;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerChangeEvent;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanControlOptions;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanGlobalOptions;
 
 import java.util.Optional;
 
@@ -23,6 +25,16 @@ public class GeomanUtils {
 
     public static void addControls(LeafletMap leafletMap, GeomanControlOptions options) {
         leafletMap.executeJs(leafletMap, "pm.addControls", options);
+    }
+
+    /**
+     * All new layers will be created in the passed layer
+     * @param leafletMap The map that we are modifying
+     * @param featureGroup The FeatureGroup layer where we will add new layers.
+     */
+    public static void setEditableFeatureGroup(LeafletMap leafletMap, FeatureGroup featureGroup) {
+        // this will create all new layers in the FeatureGroup layer
+        leafletMap.executeJs(leafletMap, "pm.setGlobalOptions", new GeomanGlobalOptions(featureGroup));
     }
 
     /**
@@ -103,5 +115,4 @@ public class GeomanUtils {
                 return null;
         }
     }
-
 }

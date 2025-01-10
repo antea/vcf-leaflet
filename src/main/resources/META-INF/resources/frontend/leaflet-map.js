@@ -155,15 +155,23 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
       // console.log("LeafletMap - callLeafletFunction() - result", result);
       return result;
     } else if (operation.functionName.startsWith("pm")) {
-      this._callPMFunction(operation.functionName, leafletArgs);
+      this._callPMFunction(target, operation.functionName, leafletArgs);
     }
   }
 
-  _callPMFunction(functionName, leafletArgs) {
-    L.PM.reInitLayer(this.map);
-    let pmFn = this.map.pm[functionName.replace("pm.", "")]
+  _callPMFunction(target, functionName, leafletArgs) {
+    if ("pm.addControls" === functionName) {
+      L.PM.reInitLayer(this.map);
+    }
+
+    let pm = target.pm;
+    let simpleFunctionName = functionName.replace("pm.", "");
+
+    let pmFn = pm[simpleFunctionName]
     if (pmFn) {
-      pmFn.call(this.map.pm, leafletArgs[0]);
+      if (leafletArgs.length > 0) {
+        pmFn.call(pm, leafletArgs[0]);
+      } else pmFn.call(pm);
     }
   }
 

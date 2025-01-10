@@ -1,7 +1,9 @@
 package org.vaadin.addons.componentfactory.leaflet.demo.view.plugins;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
@@ -9,6 +11,7 @@ import org.vaadin.addons.componentfactory.leaflet.controls.LayersControl;
 import org.vaadin.addons.componentfactory.leaflet.demo.LeafletDemoApp;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.ExampleContainer;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
+import org.vaadin.addons.componentfactory.leaflet.layer.groups.FeatureGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
@@ -34,13 +37,13 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         options.setZoom(7);
         options.setPreferCanvas(true);
 
-        LeafletMap leafletMapRight = new LeafletMap(options);
-        leafletMapRight.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
-        leafletMapRight.addLayer(createRandomMarkers(DEFAULT_ICON, 30));
+        LeafletMap leafletMap = new LeafletMap(options);
+        leafletMap.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
+        leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 30));
 
-        leafletMapRight.onCreate(event -> {
+        leafletMap.onCreate(event -> {
             String newLayerId = event.getNewLayerId();
-            Layer layer = leafletMapRight.findLayer(newLayerId);
+            Layer layer = leafletMap.findLayer(newLayerId);
             String message = layer != null && event.getChild() != null
                     ? "Layer %s of type %s created and added to the server map"
                     : "Layer %s of type %s created BUT NOT added to the server map!";
@@ -48,9 +51,9 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
             Notification.show(String.format(message, newLayerId, event.getShape()));
         });
 
-        leafletMapRight.onRemove(event -> {
+        leafletMap.onRemove(event -> {
             String removedLayerId = event.getRemovedLayerId();
-            Layer layer = leafletMapRight.findLayer(removedLayerId);
+            Layer layer = leafletMap.findLayer(removedLayerId);
             String message = Objects.equals(layer.getUuid(), removedLayerId)
                     ? "Layer %s of type %s  was NOT deleted on the server map!"
                     : "Layer %s of type %s  was deleted also on the server map";
@@ -58,19 +61,32 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
             Notification.show(String.format(message, removedLayerId, event.getShape()));
         });
 
-        leafletMapRight.addControl(new LayersControl());
+        LayersControl leafletControl = new LayersControl();
+        leafletControl.addTo(leafletMap);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setSizeFull();
-        horizontalLayout.add(leafletMapRight);
-        addToContent(horizontalLayout);
+        FeatureGroup editFeatureGroup = new FeatureGroup();
+        editFeatureGroup.setAttribution("Editable group");
+        editFeatureGroup.addTo(leafletMap);
+
+        leafletControl.addOverlay(editFeatureGroup, "Editable Layer");
+
+        Button editButton = new Button("Edit feature group");
+        editButton.addClickListener(event -> {
+            GeomanUtils.setEditableFeatureGroup(leafletMap, editFeatureGroup);
+        });
+
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSizeFull();
+        verticalLayout.add(editButton);
+        verticalLayout.add(leafletMap);
+        addToContent(verticalLayout);
 
         GeomanControlOptions geomanControlOptions = new GeomanControlOptions();
         geomanControlOptions.setCutPolygon(false);
         geomanControlOptions.setDrawPolygon(false);
         geomanControlOptions.setDrawCircle(false);
         geomanControlOptions.setDrawCircleMarker(false);
-        GeomanUtils.addControls(leafletMapRight, geomanControlOptions);
+        GeomanUtils.addControls(leafletMap, geomanControlOptions);
     }
 
     private LayerGroup createRandomMarkers(Icon icon, int limit) {
