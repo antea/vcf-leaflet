@@ -4,7 +4,7 @@
 
 	<groupId>org.vaadin.addons.antea</groupId>
 	<artifactId>vcf-leaflet</artifactId>
-	<version>23.4.0.3-ANTEA</version>
+	<version>23.4.0.4-ANTEA-SNAPSHOT</version>
 	<name>Leaflet</name>
 	<description>Integration of Leaflet Map for Vaadin Flow</description>
 	<scm>

@@ -49,7 +49,9 @@ public class MarkersEventsExample extends ExampleContainer {
         eventLabel.getStyle().set("font-weight", "bold");
         Button buttonAdd = new Button("Add click listener later");
         Button buttonRemove = new Button("Remove listener");
-        HorizontalLayout buttonLayout = new HorizontalLayout(buttonAdd, buttonRemove);
+        Button buttonAddToMap = new Button("Add click listener to Map later");
+        Button buttonRemoveFromMap = new Button("Remove listener from Map");
+        HorizontalLayout buttonLayout = new HorizontalLayout(buttonAdd, buttonRemove, buttonAddToMap, buttonRemoveFromMap);
 
         MapOptions options = new DefaultMapOptions();
         options.setCenter(new LatLng(47.070121823, 19.2041015625));
@@ -81,6 +83,9 @@ public class MarkersEventsExample extends ExampleContainer {
         LeafletEventListener<MouseEvent> logClickEvent = this::logClickEvent;
         buttonAdd.addClickListener(e -> marker.onClick(logClickEvent));
         buttonRemove.addClickListener(e -> marker.removeEventListener(MouseEventType.click, logClickEvent));
+
+        buttonAddToMap.addClickListener(e -> leafletMap.onClick(logClickEvent));
+        buttonRemoveFromMap.addClickListener(e -> leafletMap.removeEventListener(MouseEventType.click, logClickEvent));
     }
 
     protected void logEvent(LeafletEvent leafletEvent) {
@@ -90,7 +95,7 @@ public class MarkersEventsExample extends ExampleContainer {
     protected void logClickEvent(LeafletEvent leafletEvent) {
         this.eventLabel.setText("'This is the only click listener and was added later" +
                 leafletEvent.getType().name() + "' event caught in listener.");
-        log.info("Clicked on marker and this listener was added later");
-        Notification.show("Clicked on marker and this listener was added later");
+        log.info("Clicked and this listener was added later");
+        Notification.show("Clicked and this listener was added later");
     }
 }

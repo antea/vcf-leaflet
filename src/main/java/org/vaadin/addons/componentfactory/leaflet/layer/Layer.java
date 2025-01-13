@@ -14,26 +14,11 @@
 
 package org.vaadin.addons.componentfactory.leaflet.layer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.LeafletObject;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.Evented;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEventListener;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.PopupEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.TooltipEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.PopupEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.TooltipEventType;
@@ -41,6 +26,11 @@ import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.ExecutableFunctions;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.popup.Popup;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.tooltip.Tooltip;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A set of methods from the Layer base class that all Leaflet layers use.
@@ -220,8 +210,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
             // listener for these kind of events, so now we tell the map to start listening for them
             if (getParent() != null) {
                 findLeafletMap(this)
-                        .ifPresent(map ->
-                                map.executeJs("registerEventListener", Layer.this, eventType.getLeafletEvent()));
+                        .ifPresent(map -> doRegisterEventListener(this, map, eventType));
             }
             events.add(eventType.getLeafletEvent());
         }
@@ -231,6 +220,10 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
             eventListeners.putIfAbsent(eventType, listeners);
         }
         listeners.add(listener);
+    }
+
+    protected void doRegisterEventListener(Identifiable target, LeafletMap leafletMap, LeafletEventType eventType) {
+        leafletMap.executeGeneralJs(target, "registerMapEventListener", eventType.getLeafletEvent());
     }
 
     @Override

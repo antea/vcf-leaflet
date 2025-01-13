@@ -72,6 +72,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,9 +95,25 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     private static class MapLayer extends LayerGroup {
         private static final long serialVersionUID = -3205153902141978918L;
+        private final transient LeafletMap leafletMap;
+
+        public MapLayer(LeafletMap leafletMap) {
+            super();
+            this.leafletMap = leafletMap;
+        }
+
+        @Override
+        public <T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener) {
+            // this layer always has parent == null since it is the root, so here we need to force it
+            // also, events for this layer should be set to the map since this layer is not serialized to the client
+            if (!getEvents().contains(eventType.getLeafletEvent())) {
+                doRegisterEventListener(leafletMap, leafletMap, eventType);
+            }
+            super.addEventListener(eventType, listener);
+        }
     }
 
-    private final MapLayer mapLayer = new MapLayer();
+    private final MapLayer mapLayer;
 
     private boolean ready = false;
 
@@ -128,6 +145,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         optionsClass = mapOptions.getClass();
         getModel().setMapOptions(mapOptions);
         setSizeFull();
+        mapLayer = new MapLayer(this);
         registerListeners();
     }
 
