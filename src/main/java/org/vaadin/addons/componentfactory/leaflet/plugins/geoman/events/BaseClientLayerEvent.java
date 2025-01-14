@@ -12,7 +12,6 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.Sh
 
 @Getter
 public abstract class BaseClientLayerEvent extends LeafletEvent {
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final ShapeType shape;
 
@@ -25,19 +24,13 @@ public abstract class BaseClientLayerEvent extends LeafletEvent {
         this.editedLayerId = layerId;
     }
 
-    protected <T> T readValue(JsonValue jsonValue, final TypeReference<T> valueType) {
-        if (jsonValue == null) {
-            return null;
-        }
-        try {
-            return OBJECT_MAPPER.readValue(jsonValue.toJson(), valueType);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+    public BaseClientLayerEvent(LeafletMap source, boolean fromClient, LeafletEventType type,
+            String targetLayerId, ShapeType shape) {
+        this(source, fromClient, type, targetLayerId, targetLayerId, shape);
     }
 
     @Override
     public String toString() {
-        return "Create [type=" + super.getType() + ", shape=" + getShape() + "]";
+        return "Client Event [type=" + super.getType() + ", shape=" + getShape() + "]";
     }
 }

@@ -35,11 +35,10 @@ import java.util.function.Supplier;
 /**
  * A set of methods from the Layer base class that all Leaflet layers use.
  * Inherits all methods, options and events from L.Evented.
- * 
  * @author <strong>Gabor Kokeny</strong> Email:
- *         <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
- * @since 2020-02-06
+ * <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
  * @version 1.0
+ * @since 2020-02-06
  */
 public abstract class Layer extends LeafletObject implements Evented, LayerPopupFunctions, LayerTooltipFunctions {
 
@@ -84,9 +83,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired after the layer is added to a map
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onAdd(LeafletEventListener<LeafletEvent> listener) {
         on(LayerEventType.add, listener);
@@ -94,9 +91,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired after the layer is removed from a map
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onRemove(LeafletEventListener<LeafletEvent> listener) {
         on(LayerEventType.remove, listener);
@@ -104,9 +99,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired when a tooltip bound to this layer is opened.
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onTooltipOpen(LeafletEventListener<TooltipEvent> listener) {
         on(TooltipEventType.tooltipopen, listener);
@@ -114,9 +107,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired when a tooltip bound to this layer is closed.
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onTooltipClose(LeafletEventListener<TooltipEvent> listener) {
         on(TooltipEventType.tooltipclose, listener);
@@ -124,9 +115,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired when a popup bound to this layer is opened
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onPopupOpen(LeafletEventListener<PopupEvent> listener) {
         on(PopupEventType.popupopen, listener);
@@ -134,9 +123,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Fired when a popup bound to this layer is closed
-     * 
-     * @param listener
-     *            the event listener
+     * @param listener the event listener
      */
     public void onPopupClose(LeafletEventListener<PopupEvent> listener) {
         on(PopupEventType.popupclose, listener);
@@ -149,14 +136,12 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         event.ifPresent(leafletEventType ->
                 eventListeners.get(leafletEventType)
                         .forEach(listener ->
-                                ((LeafletEventListener<T>)listener).handleEvent(leafletEvent)));
+                                ((LeafletEventListener<T>) listener).handleEvent(leafletEvent)));
     }
 
     /**
      * Adds the layer to the given layer group
-     * 
-     * @param layerGroup
-     *            the layer group
+     * @param layerGroup the layer group
      */
     public void addTo(LayerGroup layerGroup) {
         setParent(layerGroup);
@@ -165,9 +150,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
 
     /**
      * Adds the layer to the given map
-     * 
-     * @param leafletMap
-     *            the leaflet map
+     * @param leafletMap the leaflet map
      */
     public void addTo(LeafletMap leafletMap) {
         setParent(leafletMap);
@@ -206,12 +189,10 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
     @Override
     public <T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener) {
         if (!events.contains(eventType.getLeafletEvent())) {
-            // if parent is already set, this layer was already added to the map, and the map did not register a
-            // listener for these kind of events, so now we tell the map to start listening for them
-            if (getParent() != null) {
-                findLeafletMap(this)
-                        .ifPresent(map -> doRegisterEventListener(this, map, eventType));
-            }
+            // if this layer was already added to the map, and the map did not register a
+            // listener for these kind of events, now we tell the map to start listening for them
+            Optional.ofNullable(findLeafletMap(this))
+                    .ifPresent(map -> doRegisterEventListener(this, map, eventType));
             events.add(eventType.getLeafletEvent());
         }
         Set<LeafletEventListener<?>> listeners = eventListeners.get(eventType);
@@ -227,7 +208,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
     }
 
     @Override
-    public boolean removeEventListener(LeafletEventType eventType, LeafletEventListener<?> listener){
+    public boolean removeEventListener(LeafletEventType eventType, LeafletEventListener<?> listener) {
         Set<LeafletEventListener<?>> listeners = this.eventListeners.get(eventType);
         if (listeners != null) {
             boolean remove = listeners.remove(listener);
@@ -258,7 +239,7 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         this.events.remove(eventType.getLeafletEvent());
         executeJs(this, "removeEventListener", eventType.getLeafletEvent());
     }
-   
+
     /**
      * Removes the layer from the map it is currently active on
      */
@@ -272,20 +253,19 @@ public abstract class Layer extends LeafletObject implements Evented, LayerPopup
         }
     }
 
-    private Optional<LeafletMap> findLeafletMap(Layer layer) {
-        ExecutableFunctions parent = layer.getParent();
-        if (parent instanceof LeafletMap) {
-            return Optional.of((LeafletMap) parent);
-        } else if (parent instanceof LayerGroup) {
-            LayerGroup parentLayerGroup = (LayerGroup) parent;
-            return parentLayerGroup.getLayers().stream()
-                    .map(this::findLeafletMap)
-                    .filter(Optional::isPresent)
-                    .findFirst()
-                    .orElse(Optional.empty());
-        } else {
-            return Optional.empty();
-        }
-    }
+    private LeafletMap findLeafletMap(Layer layer) {
+        ExecutableFunctions parent = layer == null
+                ? null
+                : layer.getParent();
 
+        if (parent instanceof LeafletMap) {
+            return (LeafletMap) parent;
+        }
+
+        if (parent instanceof Layer) {
+            return findLeafletMap((Layer) parent);
+        }
+
+        return null;
+    }
 }

@@ -147,6 +147,9 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     );
     // console.log("LeafletMap - callLeafletFunction() - leafletArgs", leafletArgs);
 
+    if ((operation.functionName === "addLayer")) {
+      this.tryToAddGeomanListeners(leafletArgs[0]);
+    }
     let leafletFn = target[operation.functionName];
     // console.log("LeafletMap - callLeafletFunction() - leafletFn", leafletFn);
 
@@ -160,8 +163,17 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   }
 
   _callPMFunction(target, functionName, leafletArgs) {
+    // we are adding Editing functions to our map
     if ("pm.addControls" === functionName) {
       L.PM.reInitLayer(this.map);
+
+      let thisLeafletMap = this;
+      // every new Layer that is created by the user should have a pm:update listener to sync with the server
+      this.map.on("pm:create", function (event) {
+        if (thisLeafletMap._isInteresting(event.layer)) {
+          event.layer.on("pm:update", thisLeafletMap.onLayerEditedOnClient, this);
+        }
+      }, this)
     }
 
     let pm = target.pm;
@@ -328,7 +340,7 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
           handler: this.onTileEventHandler,
         },
         {
-          events: ["pm:create", "pm:remove", "pm:change", "pm:drag"],
+          events: ["pm:create", "pm:remove", "pm:change", "pm:dragend", "pm:update"],
           handler: this.onGeomanEventHandler,
         },
       ];
@@ -392,9 +404,41 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     console.info("LeafletMap - onTileEventHandler()", event);
     this.dispatchEvent( new CustomEvent(event.type, { detail: event }));
   }
+
   onGeomanEventHandler(event) {
     console.info("LeafletMap - onGeomanEventHandler()", event);
-    this.dispatchEvent( new CustomEvent(event.type, { detail: event }));
+    this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
+  }
+
+  // this is a client-only listener that inform the server that some layer needs to be synchronized
+  onLayerEditedOnClient(event) {
+    this.$server.layerEdited(event.layer.options.uuid, event.shape, event.layer._latlng, event.layer._latlngs,
+        event.layer._radius, event.layer.options.text)
+  }
+
+  _isInteresting(layer) {
+    return layer instanceof L.Marker
+        || layer instanceof L.CircleMarker
+        || layer instanceof L.Rectangle
+        || layer instanceof L.Polygon
+  }
+
+  tryToAddGeomanListeners(layer) {
+    if (!this.map.pm)
+      return;
+    let thisLeafletMap = this
+
+    if (layer instanceof L.LayerGroup) {
+      layer.eachLayer(function (child) {
+        thisLeafletMap.tryToAddGeomanListeners(child)
+      })
+    }
+
+    if (this._isInteresting(layer)) {
+      // if a layer is created here, we need to listen for modification and inform the server
+      // layer.on("pm:dragend", this.onLayerDraggedOnClient, this);
+      layer.on("pm:update", this.onLayerEditedOnClient, this);
+    }
   }
 }
 

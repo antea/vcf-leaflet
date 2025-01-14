@@ -38,6 +38,8 @@ import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
 import java.util.List;
 
+import static org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils.readValue;
+
 /**
  * This class represents the event that is raised when a Layer is drawn by the client side using Geoman toolbar
  * Fired when a layer is created via <a href="https://geoman.io/docs/leaflet/modes/draw-mode">Draw Mode</a>.
@@ -46,8 +48,10 @@ import java.util.List;
 @DomEvent("pm:create")
 public class ClientLayerAddEvent extends BaseClientLayerEvent {
 
-    // if a Marker or Text or CircleMarker was created, this is its coordinates
+    // if a Marker or Text or CircleMarker or a Circle was created, this is its coordinates
     private final LatLng latLng;
+
+    private final Double radius;
     // Line
     private final List<LatLng> lineLatLngs;
 
@@ -63,14 +67,13 @@ public class ClientLayerAddEvent extends BaseClientLayerEvent {
             @EventData("event.detail.layer._leaflet_id") String createdLayerId,
             @EventData("event.detail.layer._latlng") JsonValue latLng,
             @EventData("event.detail.layer._latlngs") JsonValue latLngs,
+            @EventData("event.detail.layer._radius") Double radius,
             @EventData("event.detail.shape") String shape) {
-        super(source, fromClient, EditEventType.create, targetLayerId, createdLayerId, ShapeType.of(shape));
-        this.latLng = readValue(latLng, new TypeReference<>() {
-        });
-        this.lineLatLngs = readValue(latLngs, new TypeReference<>() {
-        });
-        this.rectangleLatLngs = readValue(latLngs, new TypeReference<>() {
-        });
+        super(source, fromClient, EditEventType.create, targetLayerId, createdLayerId, ShapeType.ofGeomanShape(shape));
+        this.radius = radius;
+        this.latLng = readValue(latLng, new TypeReference<>() {});
+        this.lineLatLngs = readValue(latLngs, new TypeReference<>() {});
+        this.rectangleLatLngs = readValue(latLngs, new TypeReference<>() {});
     }
 
     public String getNewLayerId() {

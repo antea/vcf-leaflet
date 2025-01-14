@@ -35,10 +35,8 @@ import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.page.PendingJavaScriptResult.JavaScriptException;
 import com.vaadin.flow.internal.JsonSerializer;
 import com.vaadin.flow.shared.Registration;
-import elemental.json.Json;
-import elemental.json.JsonArray;
-import elemental.json.JsonObject;
-import elemental.json.JsonType;
+import elemental.json.*;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
@@ -51,19 +49,15 @@ import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.GeolocationFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapConversionFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapGetStateFunctions;
-import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.MapModifyStateFunctions;
+import org.vaadin.addons.componentfactory.leaflet.layer.map.functions.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.raster.TileLayer;
 import org.vaadin.addons.componentfactory.leaflet.operations.LeafletOperation;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils;
-import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerAddEvent;
-import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerChangeEvent;
-import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLayerRemoveEvent;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.*;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.supports.SupportsClientCreateEvents;
+import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.supports.SupportsClientEditEvents;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.supports.SupportsClientRemoveEvents;
 import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 
@@ -72,7 +66,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -87,7 +81,7 @@ import java.util.stream.Stream;
 @NpmPackage(value = "@geoman-io/leaflet-geoman-free", version = "2.14.2")
 public final class LeafletMap extends Component implements MapModifyStateFunctions, MapGetStateFunctions, GeolocationFunctions, MapConversionFunctions, SupportsMouseEvents,
         SupportsMapEvents, SupportsLocationEvents, SupportsKeyboardEvents, SupportsLayerEvents,
-        SupportsClientRemoveEvents, SupportsClientCreateEvents, HasSize, HasTheme, HasStyle {
+        SupportsClientRemoveEvents, SupportsClientCreateEvents, SupportsClientEditEvents, HasSize, HasTheme, HasStyle {
 
     private static final long serialVersionUID = 3789693345308589828L;
 
@@ -115,6 +109,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     private final MapLayer mapLayer;
 
+    @Getter
     private boolean ready = false;
 
     private final Class<? extends MapOptions> optionsClass;
@@ -134,7 +129,8 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
             UnloadEvent.class, ViewResetEvent.class, ZoomAnimEvent.class, ZoomEndEvent.class,
             ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class,
             // Geoman events:
-            ClientLayerAddEvent.class, ClientLayerRemoveEvent.class, ClientLayerChangeEvent.class);
+            ClientLayerAddEvent.class, ClientLayerRemoveEvent.class, ClientLayerUpdateEvent.class,
+            ClientLayerDragEndEvent.class, ClientLayerUpdateInMapEvent.class);
 
     public LeafletMap() {
         this(new DefaultMapOptions());
@@ -220,6 +216,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
                     ClientLayerRemoveEvent clientLayerRemoveEvent = (ClientLayerRemoveEvent) e;
                     Layer removedLayer = findLayer(clientLayerRemoveEvent.getRemovedLayerId());
                     if (GeomanUtils.syncRemovedLayer(layer, removedLayer)) {
+                        ((ClientLayerRemoveEvent) e).setRemovedLayer(removedLayer);
                         this.fireEvent(layer, e);
                         return;
                     }
@@ -278,13 +275,31 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     }
 
     /**
-     * Removes the given layer from the map.
+     * Removes the given layer from the map. But only if it is a child of the map.
      * @param layer the layer to remove
      */
     public void removeLayer(Layer layer) {
         logger.debug("remove layer: {}", layer.getUuid());
         this.mapLayer.removeLayer(layer);
         executeJs("removeLayer", layer);
+    }
+
+    /**
+     * If we need to replace one layer with another one both on server and client.
+     * @param oldLayerUuid The old layer getUuid()
+     * @param newLayer The new layer that will be added
+     */
+    public void replaceLayer(String oldLayerUuid, Layer newLayer) {
+        this.mapLayer.findLayer(oldLayerUuid).ifPresent(oldLayer -> {
+            ExecutableFunctions parent = oldLayer.getParent();
+            if (Objects.equals(mapLayer, parent)) {
+                removeLayer(oldLayer);
+                addLayer(newLayer);
+            } else if (parent instanceof LayerGroup) {
+                ((LayerGroup) parent).removeLayer(oldLayer);
+                ((LayerGroup) parent).addLayer(newLayer);
+            }
+        });
     }
 
     public void setBaseUrl(String baseUrl) {
@@ -433,13 +448,6 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     }
 
     /**
-     * @return the ready
-     */
-    public boolean isReady() {
-        return ready;
-    }
-
-    /**
      * Map event which fired when map gets initialized on client side
      * @author <strong>Gabor Kokeny</strong> Email:
      * <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
@@ -452,6 +460,28 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
         public MapReadyEvent(LeafletMap source) {
             super(source, true);
+        }
+    }
+
+    /**
+     * Please do not call this directly. This is invoked by the client when the user modifies an interactive layer
+     * @param layerId Uuid of the modified layer
+     * @param shape The shape of the modified layer
+     * @param latLng The new latLng, if the Layer has this field
+     * @param latLngs The new latLngs, if the Layer has this field
+     * @param radius The new radius, if the Layer has this field
+     * @param modifiedText The new text, if the Layer has this field
+     */
+    @ClientCallable
+    public void layerEdited(String layerId, String shape, JsonValue latLng, JsonValue latLngs, Double radius, String modifiedText) {
+        Layer layer = findLayer(layerId);
+        if (layer != null) {
+            GeomanUtils.syncEditedLayer(layer, shape, latLng, latLngs, radius, modifiedText);
+            // now let's fire a generic event to say "some layer was edited by the user"
+            ClientLayerUpdateInMapEvent event = new ClientLayerUpdateInMapEvent(this, true,
+                    layer.getUuid(), layer.getUuid(), latLng, latLngs, modifiedText, shape);
+            event.setEditedLayer(layer);
+            fireEvent(mapLayer, event);
         }
     }
 }

@@ -29,9 +29,20 @@ public enum EditEventType implements LeafletEventType {
      */
     remove,
     /**
-     * Fired when a shape is dragged or modified. Payload include shape, latlngs
+     * Fired when a shape dragging ends
+     * <a href="https://geoman.io/docs/leaflet/modes/drag-mode">Drag mode</a>
      */
-    change;
+    dragend,
+    /**
+     * Fired when a shape is edited or modified. It is raised <b>also</b> when a drag action ends.
+     * This is observed on the edited layer
+     */
+    update,
+    /**
+     * Fired when a shape is edited or modified. It is raised <b>also</b> when a drag action ends.
+     * This is observed on the map. To implement this, we fire it on the server.
+     */
+    layerupdate;
 
     @Override
     public String getLeafletEvent() {

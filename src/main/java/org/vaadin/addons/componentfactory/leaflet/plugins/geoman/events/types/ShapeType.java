@@ -4,24 +4,29 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+@Getter
 public enum ShapeType {
 
-    MARKER ("Marker"),
+    MARKER("Marker"),
     TEXT("Text"),
     CIRCLE_MARKER("CircleMarker"),
-    LINE("Line"),
-    RECTANGLE("Rectangle");
+    POLYLINE("Polyline"),
+    RECTANGLE("Rectangle"),
+    POLYGON("Polygon"),
+    CIRCLE("Circle");
 
-    @Getter
     private final String shape;
 
     ShapeType(String shape) {
         this.shape = shape;
     }
 
-    public static ShapeType of(String shape) {
-       return Arrays.stream(ShapeType.values())
-               .filter(type -> type.getShape().equals(shape))
-               .findFirst().orElse(null);
+    public static ShapeType ofGeomanShape(String shape) {
+        if ("Line".equals(shape)) {
+            return ShapeType.POLYLINE;
+        }
+        return Arrays.stream(ShapeType.values())
+                .filter(type -> type.getShape().equals(shape))
+                .findFirst().orElse(null);
     }
 }
