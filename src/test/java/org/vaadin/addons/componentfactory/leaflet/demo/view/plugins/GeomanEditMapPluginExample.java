@@ -1,6 +1,7 @@
 package org.vaadin.addons.componentfactory.leaflet.demo.view.plugins;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,6 +25,7 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanC
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils;
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import static java.util.stream.IntStream.range;
@@ -90,7 +92,6 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                 if (ShapeType.MARKER.equals(e.getShape())) {
                     CircleMarker marker = new CircleMarker(e.getLatLng());
                     leafletMap.replaceLayer(e.getChild().getUuid(), marker);
-
                 }
             });
         });
@@ -100,16 +101,24 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
 
         leafletMap.on(EditEventType.update, e -> Notification.show("Modifications arrive to the map!!!"));
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton));
-        verticalLayout.add(leafletMap);
-        addToContent(verticalLayout);
-
         GeomanControlOptions geomanControlOptions = new GeomanControlOptions();
         geomanControlOptions.setCutPolygon(false);
         geomanControlOptions.setDrawCircleMarker(false);
         GeomanUtils.addControls(leafletMap, geomanControlOptions);
+
+        CheckboxGroup<ShapeType> checkboxGroup = new CheckboxGroup<>();
+        checkboxGroup.setItems(ShapeType.values());
+        checkboxGroup.setLabel("Draw buttons visibility");
+        checkboxGroup.addValueChangeListener(
+                e ->
+                        GeomanUtils.setDrawHandlersVisible(leafletMap, geomanControlOptions, e.getValue()));
+
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSizeFull();
+        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton));
+        verticalLayout.add(checkboxGroup);
+        verticalLayout.add(leafletMap);
+        addToContent(verticalLayout);
     }
 
     private LayerGroup createRandomMarkers(Icon icon, int limit) {

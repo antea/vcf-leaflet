@@ -21,9 +21,7 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanC
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanGlobalOptions;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * <h2>Leaflet.geoman</h2> Leaflet Plugin For Creating And Editing Geometry Layers.
@@ -60,13 +58,56 @@ public class GeomanUtils {
     }
 
     /**
-     * Change the visibility of one of the buttons that enable drawing
+     * Change the visibility of one of the buttons that enable drawing.
+     * Attention: this will remove Geoman controls and re-add it
      * @param leafletMap LeafletMap with the controls
      * @param shapeType Type of the shape for the draw button
      * @param visible Boolean that decides the visibility
      */
-    public static void setDrawHandlerVisible(LeafletMap leafletMap, ShapeType shapeType, boolean visible) {
-        // TODO_VAADIN VL-25
+    public static void setDrawHandlerVisible(LeafletMap leafletMap, GeomanControlOptions controlOptions,
+            ShapeType shapeType, boolean visible) {
+        doSetDrawHandlerVisible(controlOptions, shapeType, visible);
+        removeControls(leafletMap);
+        addControls(leafletMap, controlOptions);
+    }
+
+    /**
+     * Only the buttons corresponded to the passed shapeTypes will be visible.
+     * Attention: this will remove Geoman controls and re-add it
+     * @param leafletMap LeafletMap with the controls
+     * @param shapeTypes Type of the shape for the draw buttons that will be visible
+     */
+    public static void setDrawHandlersVisible(LeafletMap leafletMap, GeomanControlOptions controlOptions,
+            Collection<ShapeType> shapeTypes) {
+        Arrays.stream(ShapeType.values())
+                .forEach(shapeType -> doSetDrawHandlerVisible(controlOptions, shapeType, shapeTypes.contains(shapeType)));
+        removeControls(leafletMap);
+        addControls(leafletMap, controlOptions);
+    }
+
+    private static void doSetDrawHandlerVisible(GeomanControlOptions controlOptions, ShapeType shapeType, boolean visible) {
+        switch (shapeType) {
+            case CIRCLE:
+                controlOptions.setDrawCircle(visible);
+                break;
+            case MARKER:
+                controlOptions.setDrawMarker(visible);
+                break;
+            case POLYGON:
+                controlOptions.setDrawPolygon(visible);
+                break;
+            case POLYLINE:
+                controlOptions.setDrawPolyline(visible);
+                break;
+            case CIRCLE_MARKER:
+                controlOptions.setDrawCircleMarker(visible);
+                break;
+            case TEXT:
+                controlOptions.setDrawText(visible);
+                break;
+            case RECTANGLE:
+                controlOptions.setDrawRectangle(visible);
+        }
     }
 
     /**

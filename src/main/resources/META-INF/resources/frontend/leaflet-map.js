@@ -419,8 +419,10 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   _isInteresting(layer) {
     return layer instanceof L.Marker
         || layer instanceof L.CircleMarker
+        || layer instanceof L.Polyline
         || layer instanceof L.Rectangle
         || layer instanceof L.Polygon
+        || layer instanceof L.Circle
   }
 
   tryToAddGeomanListeners(layer) {
