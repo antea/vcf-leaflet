@@ -129,14 +129,14 @@ public class GeomanUtils {
      * Please note that at the moment we support the creation only of Marker, Text, CircleMarker, PolyLine and
      * Rectangle.</b>
      * @param event The event that was raised by the client
-     * @param layer The layer in which the new layer was created.
+     * @param parent The layer in which the new layer was created.
      * @return the new Layer server side, and sync the server map to the client Leaflet map
      */
-    public static Layer syncCreatedLayer(ClientLayerAddEvent event, Layer layer) {
-        if (!(layer instanceof LayerGroup)) {
+    public static Layer syncCreatedLayer(ClientLayerAddEvent event, Layer parent) {
+        if (!(parent instanceof LayerGroup)) {
             return null;
         }
-        LayerGroup parentLayer = (LayerGroup) layer;
+        LayerGroup parentLayer = (LayerGroup) parent;
 
         return Optional.ofNullable(event)
                 .map(GeomanUtils::createLayer)

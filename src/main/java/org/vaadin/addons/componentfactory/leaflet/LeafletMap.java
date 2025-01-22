@@ -87,13 +87,29 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
 
     private final Logger logger = LoggerFactory.getLogger(LeafletMap.class);
 
-    private static class MapLayer extends LayerGroup {
+    public static class MapLayer extends LayerGroup {
         private static final long serialVersionUID = -3205153902141978918L;
         private final transient LeafletMap leafletMap;
 
         public MapLayer(LeafletMap leafletMap) {
             super();
             this.leafletMap = leafletMap;
+        }
+
+        @Override
+        public void removeLayer(Layer layer) {
+            super.removeLayer(layer);
+            leafletMap.executeJs("removeLayer", layer);
+        }
+
+        @Override
+        public void executeJs(String functionName, Serializable... arguments) {
+            executeJs(leafletMap, functionName, arguments);
+        }
+
+        @Override
+        public <T extends Serializable> CompletableFuture<T> call(String functionName, Class<T> resultType, Serializable... arguments) {
+            return super.call(leafletMap, functionName, resultType, arguments);
         }
 
         @Override
@@ -201,10 +217,11 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
                 // if the layer was created by geoman, we fire also a layerAdd event with the new layer
                 if (e instanceof ClientLayerAddEvent) {
                     ClientLayerAddEvent clientLayerAddEvent = (ClientLayerAddEvent) e;
+                    Layer parent = findLayer(clientLayerAddEvent.getParentLayerId());
+                    Layer child = GeomanUtils.syncCreatedLayer(clientLayerAddEvent, parent);
+
                     LayerAddEvent layerAddEvent = new LayerAddEvent(clientLayerAddEvent.getSource(), true,
                             clientLayerAddEvent.getLayerId(), clientLayerAddEvent.getNewLayerId());
-
-                    Layer child = GeomanUtils.syncCreatedLayer(clientLayerAddEvent, layer);
                     layerAddEvent.setChild(child);
                     clientLayerAddEvent.setChild(child);
 
@@ -291,12 +308,11 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
      */
     public void replaceLayer(String oldLayerUuid, Layer newLayer) {
         this.mapLayer.findLayer(oldLayerUuid).ifPresent(oldLayer -> {
+            oldLayer.remove();
             ExecutableFunctions parent = oldLayer.getParent();
             if (Objects.equals(mapLayer, parent)) {
-                removeLayer(oldLayer);
                 addLayer(newLayer);
             } else if (parent instanceof LayerGroup) {
-                ((LayerGroup) parent).removeLayer(oldLayer);
                 ((LayerGroup) parent).addLayer(newLayer);
             }
         });

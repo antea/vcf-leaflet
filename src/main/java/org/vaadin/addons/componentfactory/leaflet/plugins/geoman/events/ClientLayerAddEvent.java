@@ -47,6 +47,7 @@ import static org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUt
 @Getter
 @DomEvent("pm:create")
 public class ClientLayerAddEvent extends BaseClientLayerEvent {
+    private String parentLayerId;
 
     // if a Marker or Text or CircleMarker or a Circle was created, this is its coordinates
     private final LatLng latLng;
@@ -63,6 +64,7 @@ public class ClientLayerAddEvent extends BaseClientLayerEvent {
 
     public ClientLayerAddEvent(LeafletMap source, boolean fromClient,
             @EventData("event.detail.target.options.uuid") String targetLayerId,
+            @EventData("event.detail.parentLayer") String parentLayerId,
             // id of the new Layer, assigned by Leaflet
             @EventData("event.detail.layer._leaflet_id") String createdLayerId,
             @EventData("event.detail.layer._latlng") JsonValue latLng,
@@ -70,6 +72,7 @@ public class ClientLayerAddEvent extends BaseClientLayerEvent {
             @EventData("event.detail.layer._radius") Double radius,
             @EventData("event.detail.shape") String shape) {
         super(source, fromClient, EditEventType.create, targetLayerId, createdLayerId, ShapeType.ofGeomanShape(shape));
+        this.parentLayerId = parentLayerId != null ? parentLayerId: targetLayerId;
         this.radius = radius;
         this.latLng = readValue(latLng, new TypeReference<>() {});
         this.lineLatLngs = readValue(latLngs, new TypeReference<>() {});
