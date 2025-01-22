@@ -27,13 +27,12 @@ import {html, PolymerElement} from "@polymer/polymer/polymer-element.js";
 import {ThemableMixin} from "@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js";
 import './leaflet-base.js';
 import './leaflet-more.js'
-// https://github.com/geoman-io/leaflet-geoman/issues/1339
-export default globalThis.L;
-
 // import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.js"; for geoman > 1.15
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.min.js";
 
 import {LeafletTypeConverter} from "./leaflet-type-converter.js";
+// https://github.com/geoman-io/leaflet-geoman/issues/1339
+export default globalThis.L;
 
 class LeafletMap extends ThemableMixin(PolymerElement) {
   static get template() {
@@ -407,6 +406,7 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
 
   onGeomanEventHandler(event) {
     console.info("LeafletMap - onGeomanEventHandler()", event);
+    event["parentLayer"] = this.map.pm.globalOptions?.layerGroup?.options.uuid;
     this.dispatchEvent(new CustomEvent(event.type, {detail: event}));
   }
 
