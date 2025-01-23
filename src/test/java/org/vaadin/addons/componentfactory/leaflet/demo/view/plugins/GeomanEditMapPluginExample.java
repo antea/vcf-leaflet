@@ -7,7 +7,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.addons.componentfactory.leaflet.LeafletMap;
 import org.vaadin.addons.componentfactory.leaflet.controls.LayersControl;
 import org.vaadin.addons.componentfactory.leaflet.demo.LeafletDemoApp;
@@ -24,6 +27,7 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.Sh
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanControlOptions;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils;
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
+import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -32,6 +36,7 @@ import static java.util.stream.IntStream.range;
 import static org.vaadin.addons.componentfactory.leaflet.types.Icon.DEFAULT_ICON;
 import static org.vaadin.addons.componentfactory.leaflet.types.LatLng.latlng;
 
+@Slf4j
 @PageTitle("Editable map")
 @Route(value = "plugin/geoman", layout = LeafletDemoApp.class)
 public class GeomanEditMapPluginExample extends ExampleContainer {
@@ -44,7 +49,7 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
 
         LeafletMap leafletMap = new LeafletMap(options);
         leafletMap.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
-        leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
+       // leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
 
         leafletMap.onCreate(event -> {
             String newLayerId = event.getNewLayerId();
@@ -113,12 +118,40 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                 e ->
                         GeomanUtils.setDrawHandlersVisible(leafletMap, geomanControlOptions, e.getValue()));
 
+
+        Marker marker = new Marker(new LatLng(45,16));
+        marker.setIcon(new Icon("images/marker-icon-demo.png"));
+        marker.setAttribution("A marker");
+        log.error("created marker {}", marker.getUuid());
+        FeatureGroup ancestor = new FeatureGroup();
+        ancestor.setAttribution("Ancestor");
+        log.error("created ancestor {}", ancestor.getUuid());
+
+        FeatureGroup parent = new FeatureGroup();
+        parent.setAttribution("Parent");
+        log.error("created parent {}", parent.getUuid());
+
+        marker.addTo(parent);
+        parent.addTo(ancestor);
+        ancestor.addTo(leafletMap);
+
+        // OK all good
+//        ancestor.addTo(leafletMap);
+//        parent.addTo(ancestor);
+//        marker.addTo(parent);
+
+
+        Button deleteButton = new Button("Delete feature group");
+
+
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton));
+        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton, deleteButton));
         verticalLayout.add(checkboxGroup);
         verticalLayout.add(leafletMap);
         addToContent(verticalLayout);
+
+        deleteButton.addClickListener(e -> marker.remove());
     }
 
     private LayerGroup createRandomMarkers(Icon icon, int limit) {

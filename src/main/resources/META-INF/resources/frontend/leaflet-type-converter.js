@@ -83,6 +83,11 @@ export class LeafletTypeConverter {
         map.registerEventListener(leafletLayer, event)
       );
     }
+
+    // if the layers where added on the server before the parent, let's force the id
+    if (layer.uuid && !(layer.uuid === layer._leaflet_id)) {
+      leafletLayer._leaflet_id = layer.uuid;
+    }
     // console.log("LeafletTypeConverter - toLeafletLayer() result", leafletLayer);
     return leafletLayer;
   }
