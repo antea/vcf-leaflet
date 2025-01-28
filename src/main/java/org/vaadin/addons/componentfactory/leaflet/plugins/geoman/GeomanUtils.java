@@ -76,6 +76,7 @@ public class GeomanUtils {
      * Attention: this will remove Geoman controls and re-add it
      * @param leafletMap LeafletMap with the controls
      * @param shapeTypes Type of the shape for the draw buttons that will be visible
+     * @param controlOptions the current options to edit and send to client
      */
     public static void setDrawHandlersVisible(LeafletMap leafletMap, GeomanControlOptions controlOptions,
             Collection<ShapeType> shapeTypes) {
