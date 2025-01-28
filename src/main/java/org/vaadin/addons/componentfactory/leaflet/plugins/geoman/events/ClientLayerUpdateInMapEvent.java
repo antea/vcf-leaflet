@@ -50,7 +50,7 @@ public class ClientLayerUpdateInMapEvent extends BaseClientLayerEvent {
         super(source, fromClient, EditEventType.layerupdate,
                 modifiedLayerUuid == null ? modifiedLayerId : modifiedLayerUuid,
                 ShapeType.ofGeomanShape(shape));
-        this.latLng = readValue(latLngs, new TypeReference<>() {});
+        this.latLng = readValue(latLng, new TypeReference<>() {});
         this.lineLatLngs = readValue(latLngs, new TypeReference<>() {});
         this.rectangleLatLngs = readValue(latLngs, new TypeReference<>() {});
         this.text = text;
