@@ -26,6 +26,8 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.Ed
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.ShapeType;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanControlOptions;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.GeomanUtils;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePosition;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePositionOptions;
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
@@ -49,6 +51,10 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
 
         LeafletMap leafletMap = new LeafletMap(options);
         leafletMap.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
+        MousePositionOptions mousePositionOptions = new MousePositionOptions();
+        mousePositionOptions.setPrefix("Lat ");
+        mousePositionOptions.setSeparator(" : Lon ");
+        new MousePosition(mousePositionOptions).addTo(leafletMap);
        // leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
 
         leafletMap.onCreate(event -> {
