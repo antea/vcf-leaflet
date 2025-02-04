@@ -14,6 +14,9 @@
 
 package org.vaadin.addons.componentfactory.leaflet.types;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents a geographical point with a certain latitude and longitude.
  * 
@@ -27,6 +30,7 @@ public class LatLng implements BasicType {
     private static final long serialVersionUID = 8519525431224154852L;
     private double lng;
     private double lat;
+    @JsonProperty("alt")
     private double altitude;
 
     public LatLng() {

@@ -192,9 +192,12 @@ public class GeomanUtils {
                     FieldUtils.writeField(polygon, "latlngs", multiLatLngArrayP, true);
                     break;
             }
-            log.info("Layer {} updated on the server", layer.getUuid());
-        } catch (IllegalAccessException e) {
+            log.info("{} {} updated on the server: new latlng {} | lineLatLngs {} | rectangleLatLngs {}", shape, layer.getUuid(),
+                    latLng, lineLatLngs, rectangleLatLngs);
+        } catch (Exception e) {
             log.error("Server was unable to log client modification for a layer", e);
+            log.error("{} {} NOT updated on the server: new latlng {} | lineLatLngs {} | rectangleLatLngs {}", shape, layer.getUuid(),
+                    latLng, lineLatLngs, rectangleLatLngs);
         }
     }
 
