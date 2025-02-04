@@ -9,7 +9,7 @@ import org.vaadin.addons.componentfactory.leaflet.annotations.LeafletArgument;
 import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
 
 /**
- * <h3>mouse position control</h3>
+ * <h2>mouse position control</h2>
  * Leaflet.MousePosition is a simple mouse position control that you can drop into your leaflet map.
  * It displays geographic coordinates of the mouse pointer, as it is moved about the map.
  * Web component: <a href="https://github.com/ardhi/Leaflet.MousePosition">Mouseposition</a><br>
