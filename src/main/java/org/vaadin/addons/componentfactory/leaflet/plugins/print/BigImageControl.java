@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
 
 /**
- * <h3>Exporter to png for Leaflet Maps</h3>
+ * <h2>Exporter to png for Leaflet Maps</h2>
  *
  * Web component: <a href="https://github.com/pasichnykvasyl/Leaflet.BigImage">BigImage</a><br>
  * <br>
