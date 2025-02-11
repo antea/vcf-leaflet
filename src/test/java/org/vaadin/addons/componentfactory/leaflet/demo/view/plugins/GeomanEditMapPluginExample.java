@@ -1,5 +1,7 @@
 package org.vaadin.addons.componentfactory.leaflet.demo.view.plugins;
 
+import com.vaadin.flow.component.DomEvent;
+import com.vaadin.flow.component.EventData;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.notification.Notification;
@@ -7,7 +9,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import elemental.json.JsonValue;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,10 @@ import org.vaadin.addons.componentfactory.leaflet.controls.LayersControl;
 import org.vaadin.addons.componentfactory.leaflet.demo.LeafletDemoApp;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.ExampleContainer;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.LeafletEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.MouseEvent;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.types.MouseEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.FeatureGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
@@ -30,6 +39,7 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePos
 import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePositionOptions;
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
+import org.vaadin.addons.componentfactory.leaflet.types.Point;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -42,6 +52,8 @@ import static org.vaadin.addons.componentfactory.leaflet.types.LatLng.latlng;
 @PageTitle("Editable map")
 @Route(value = "plugin/geoman", layout = LeafletDemoApp.class)
 public class GeomanEditMapPluginExample extends ExampleContainer {
+    private LeafletMap leafletMap;
+
     @Override
     protected void initDemo() {
         MapOptions options = new DefaultMapOptions();
@@ -49,13 +61,13 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         options.setZoom(7);
         options.setPreferCanvas(true);
 
-        LeafletMap leafletMap = new LeafletMap(options);
+        leafletMap = new LeafletMap(options);
         leafletMap.setBaseUrl("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png");
         MousePositionOptions mousePositionOptions = new MousePositionOptions();
         mousePositionOptions.setPrefix("Lat ");
         mousePositionOptions.setSeparator(" : Lon ");
         new MousePosition(mousePositionOptions).addTo(leafletMap);
-       // leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
+        leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
 
         leafletMap.onCreate(event -> {
             String newLayerId = event.getNewLayerId();
@@ -124,8 +136,7 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                 e ->
                         GeomanUtils.setDrawHandlersVisible(leafletMap, geomanControlOptions, e.getValue()));
 
-
-        Marker marker = new Marker(new LatLng(45,16));
+        Marker marker = new Marker(new LatLng(45, 16));
         marker.setIcon(new Icon("images/marker-icon-demo.png"));
         marker.setAttribution("A marker");
         log.error("created marker {}", marker.getUuid());
@@ -142,13 +153,11 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         ancestor.addTo(leafletMap);
 
         // OK all good
-//        ancestor.addTo(leafletMap);
-//        parent.addTo(ancestor);
-//        marker.addTo(parent);
-
+        //        ancestor.addTo(leafletMap);
+        //        parent.addTo(ancestor);
+        //        marker.addTo(parent);
 
         Button deleteButton = new Button("Delete feature group");
-
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -176,8 +185,43 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                 marker.addEventListener(EditEventType.update, event -> {
                     Notification.show("Marker updated!");
                 });
+
+                String format = "function fForCustom(){" +
+                        "document.getElementsByTagName('leaflet-map')[0]" +
+                        ".onBaseEventHandler({type: '%s', layerId : '%s'});" +
+                        "};" +
+                        "fForCustom()";
+                String functionForCustomEvent = String.format(format, OtherEventType.selectWhileEditing, marker.getUuid());
+                marker.bindPopup("This is a popup with a button " +
+                        "<div><button class=\"v-button v-widget\" " +
+                        "onclick=\"" + functionForCustomEvent + "\">"
+                        + "<span class=\"v-button-wrap\"><img class=\"v-icon\" src=\"images/marker-icon-demo.png"
+                        + "\"><span class=\"v-button-caption\">"
+                        + " Draw</span></button></div>");
+                leafletMap.addEventListener(OtherEventType.selectWhileEditing, event -> {
+                    Notification.show("Tooltip clicked!" + ((SelectToolTipEvent)event).descendantLayerId);
+                });
+                leafletMap.registerListener(SelectToolTipEvent.class);
             }
         });
         return layerGroup;
+    }
+
+    @DomEvent("leaflet-selectWhileEditing")
+    public static class SelectToolTipEvent extends LeafletEvent {
+
+        private static final long serialVersionUID = -5415454418644767665L;
+        @Getter
+        private final String descendantLayerId;
+
+        public SelectToolTipEvent(LeafletMap source, boolean fromClient,
+                @EventData("event.detail.layerId") String layerId) {
+            super(source, fromClient, source.getUuid(), OtherEventType.selectWhileEditing);
+            this.descendantLayerId = layerId;
+        }
+    }
+
+    public enum OtherEventType implements LeafletEventType {
+        selectWhileEditing;
     }
 }
