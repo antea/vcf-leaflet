@@ -209,6 +209,13 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         };
     }
 
+    public void registerListener(Class<? extends LeafletEvent> c) {
+        addListener(c, e -> {
+            Layer layer = findLayer(e.getLayerId());
+            this.fireEvent(layer, e);
+        });
+    }
+
     private void registerListeners() {
         eventsClasses.forEach(c -> {
             addListener(c, e -> {
@@ -426,6 +433,12 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         }
     }
 
+    /**
+     * Attention, if the event is not a native LeafletEventType managed by the map, you need to call also {@link #registerListener(Class)}
+     * @param eventType type of the event to be listening
+     * @param listener  the event listener
+     * @param <T> the type of the event
+     */
     @Override
     public <T extends LeafletEvent> void addEventListener(LeafletEventType eventType, LeafletEventListener<T> listener) {
         this.mapLayer.addEventListener(eventType, listener);
