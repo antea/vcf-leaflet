@@ -162,6 +162,10 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   }
 
   _callPMFunction(target, functionName, leafletArgs) {
+    if ("pm.setMarkerDrawIcon" === functionName) {
+      this._pmSetMarkerDrawIcon(target.pm, leafletArgs[0]);
+      return;
+    }
     // we are adding Editing functions to our map
     if ("pm.addControls" === functionName) {
       L.PM.reInitLayer(this.map);
@@ -184,6 +188,12 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
         pmFn.call(pm, leafletArgs[0]);
       } else pmFn.call(pm);
     }
+  }
+
+  _pmSetMarkerDrawIcon(pm, drawIcon) {
+    let drawOptions = pm.Draw.getOptions()
+    drawOptions.markerStyle.icon = drawIcon
+    pm.Draw.setOptions(drawOptions);
   }
 
   _findTargetLayer(operation) {

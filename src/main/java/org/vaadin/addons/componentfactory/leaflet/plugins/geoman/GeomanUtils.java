@@ -19,6 +19,7 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.ClientLa
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.ShapeType;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanControlOptions;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanGlobalOptions;
+import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
 import java.util.*;
@@ -55,6 +56,15 @@ public class GeomanUtils {
      */
     public static void enableDraw(LeafletMap leafletMap, ShapeType shapeType) {
         leafletMap.executeJs(leafletMap, "pm.enableDraw", shapeType.getShape());
+    }
+
+    /**
+     * We can specify the icon to be used for marker creation
+     * @param leafletMap LeafletMap to be modified
+     * @param icon the new icon for markers
+     */
+    public static void setMarkerDrawIcon(LeafletMap leafletMap, Icon icon) {
+        leafletMap.executeJs(leafletMap, "pm.setMarkerDrawIcon", icon);
     }
 
     /**
