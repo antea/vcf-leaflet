@@ -159,9 +159,13 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
 
         Button deleteButton = new Button("Delete feature group");
 
+        Button setDefaultMarkerButton = new Button("Set default marker", event -> {
+            GeomanUtils.setMarkerDrawIcon(leafletMap, new Icon("images/marker-icon-demo.png"));
+        });
+
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton, deleteButton));
+        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton, deleteButton, setDefaultMarkerButton));
         verticalLayout.add(checkboxGroup);
         verticalLayout.add(leafletMap);
         addToContent(verticalLayout);
@@ -199,7 +203,7 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                         + "\"><span class=\"v-button-caption\">"
                         + " Draw</span></button></div>");
                 leafletMap.addEventListener(OtherEventType.selectWhileEditing, event -> {
-                    Notification.show("Tooltip clicked!" + ((SelectToolTipEvent)event).descendantLayerId);
+                    Notification.show("Tooltip clicked!" + ((SelectToolTipEvent) event).descendantLayerId);
                 });
                 leafletMap.registerListener(SelectToolTipEvent.class);
             }
