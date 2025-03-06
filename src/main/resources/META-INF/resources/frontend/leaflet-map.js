@@ -31,6 +31,7 @@ import './leaflet-more.js'
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.min.js";
 
 import {LeafletTypeConverter} from "./leaflet-type-converter.js";
+import {DomUtil} from "leaflet/dist/leaflet-src.esm";
 // https://github.com/geoman-io/leaflet-geoman/issues/1339
 export default globalThis.L;
 
@@ -452,6 +453,28 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
       layer.on("pm:update", this.onLayerEditedOnClient, this);
     }
   }
+
+  /**
+   * Fit to the bounds that include all the layers inside
+
+  /**
+   * Let us make TileLayers grayscale
+   * @param add boolean, true will make the TileLayers grayscale
+   */
+  addOrRemoveGrayscaleInLeafletLayer = function (add) {
+    this.map.eachLayer(function (layer) {
+      if (layer instanceof L.TileLayer) {
+        const tileContainer = layer._container;
+        if (add)
+          DomUtil.addClass(tileContainer, 'grayscale')
+        else
+          DomUtil.removeClass(tileContainer, 'grayscale')
+      }
+    });
+  }
+
 }
 
 customElements.define(LeafletMap.is, LeafletMap);
+
+

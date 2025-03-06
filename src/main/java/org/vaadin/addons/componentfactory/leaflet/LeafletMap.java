@@ -434,9 +434,10 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     }
 
     /**
-     * Attention, if the event is not a native LeafletEventType managed by the map, you need to call also {@link #registerListener(Class)}
+     * Attention, if the event is not a native LeafletEventType managed by the map, you need to call also
+     * {@link #registerListener(Class)}
      * @param eventType type of the event to be listening
-     * @param listener  the event listener
+     * @param listener the event listener
      * @param <T> the type of the event
      */
     @Override
@@ -512,5 +513,14 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
             event.setEditedLayer(layer);
             fireEvent(mapLayer, event);
         }
+    }
+
+    /**
+     * Set the TileLayer to grayscale if the map has a set id.
+     * @param addOrRemove true to set the TyleLayer to grayscale, false to disable
+     */
+    public void addOrRemoveGrayscaleInLeafletLayer(boolean addOrRemove) {
+        getElement().callJsFunction("addOrRemoveGrayscaleInLeafletLayer", addOrRemove);
+    }
     }
 }

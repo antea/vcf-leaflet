@@ -102,3 +102,10 @@
   width: 80px;
   text-align: center;
 }
+
+/* Style for making TileLayers grayscale */
+.grayscale {
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
