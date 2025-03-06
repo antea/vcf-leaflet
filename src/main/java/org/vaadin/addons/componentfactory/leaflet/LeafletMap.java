@@ -522,5 +522,11 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     public void addOrRemoveGrayscaleInLeafletLayer(boolean addOrRemove) {
         getElement().callJsFunction("addOrRemoveGrayscaleInLeafletLayer", addOrRemove);
     }
+
+    /**
+     * Compute the Bounds that contains all the inner layers and invokes fitToBounds on it
+     */
+    public void fitToInnerLayerBounds() {
+        getElement().callJsFunction("fitToInnerLayerBounds");
     }
 }

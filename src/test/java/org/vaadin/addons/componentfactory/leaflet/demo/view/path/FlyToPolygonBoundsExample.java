@@ -51,6 +51,9 @@ public class FlyToPolygonBoundsExample extends ExampleContainer {
         polygon.onClick((event) -> leafletMap.flyToBounds(polygon.getBounds()));
         polygon.addTo(leafletMap);
 
+        Polygon polygon2 = new Polygon(latlng(44.0, 17.3), latlng(44.3, 18.42), latlng(44.3, 18.82), latlng(44.5, 17.82), latlng(44.0, 17.3));
+        polygon2.addTo(leafletMap);
+
         addToContent(leafletMap);
 
         createFormControls();
@@ -77,7 +80,14 @@ public class FlyToPolygonBoundsExample extends ExampleContainer {
             leafletMap.fitBounds(polygon.getBounds(), fitBoundsOptions);
         });
 
-        addToSidebar(maxZoom, flyToBounds, fitToBounds);
+
+        Button fitToBoundsAll = new Button("Fit to bounds of all");
+        fitToBoundsAll.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        fitToBoundsAll.addClickListener((event) -> {
+            leafletMap.fitToInnerLayerBounds();
+        });
+
+        addToSidebar(maxZoom, flyToBounds, fitToBounds, fitToBoundsAll);
     }
 
 }

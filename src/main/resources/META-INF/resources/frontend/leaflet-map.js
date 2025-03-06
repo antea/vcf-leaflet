@@ -456,6 +456,18 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
 
   /**
    * Fit to the bounds that include all the layers inside
+   */
+  fitToInnerLayerBounds() {
+    let bounds = L.latLngBounds();
+
+    this.map.eachLayer(function (layer) {
+      if (layer.getBounds) {
+        bounds.extend(layer.getBounds());
+      }
+    });
+
+    this.map.fitBounds(bounds); // Optionally fit the map to the combined bounds
+  }
 
   /**
    * Let us make TileLayers grayscale
