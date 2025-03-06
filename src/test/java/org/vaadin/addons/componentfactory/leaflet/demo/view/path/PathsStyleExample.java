@@ -48,7 +48,7 @@ public class PathsStyleExample extends ExampleContainer {
 		leafletMap.setBaseUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
 
 		binder = new Binder<>(PathOptions.class);
-		createFormControls(binder);
+		createFormControls(leafletMap, binder);
 
 		binder.setBean(new PathOptions());
 
@@ -60,12 +60,12 @@ public class PathsStyleExample extends ExampleContainer {
 		addToContent(leafletMap);
 	}
 
-	private void createFormControls(Binder<PathOptions> binder) {
-		// Stroke control
-		FormLayout form = new FormLayout();
-		Checkbox checkbox = new Checkbox();
-		form.addFormItem(checkbox, "Stroke");
-		binder.forField(checkbox).bind("stroke");
+    private void createFormControls(LeafletMap map, Binder<PathOptions> binder) {
+        // Stroke control
+        FormLayout form = new FormLayout();
+        Checkbox checkbox = new Checkbox();
+        form.addFormItem(checkbox, "Stroke");
+        binder.forField(checkbox).bind("stroke");
 
 		Select<String> strokeColor = new Select<>();
 		strokeColor.setItems("red", "blue", "white", "green", "yellow", "gray", "black");
@@ -109,7 +109,13 @@ public class PathsStyleExample extends ExampleContainer {
 		});
 		form.add(reset);
 
-		addToSidebar(form);
-	}
 
+        Checkbox grayScaleCheckbox = new Checkbox("Grayscale");
+        grayScaleCheckbox.addValueChangeListener((event) -> {
+            map.addOrRemoveGrayscaleInLeafletLayer(event.getValue());
+        });
+        form.add(grayScaleCheckbox);
+
+        addToSidebar(form);
+    }
 }
