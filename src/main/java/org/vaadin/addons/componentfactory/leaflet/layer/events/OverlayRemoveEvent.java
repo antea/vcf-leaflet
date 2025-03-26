@@ -30,10 +30,22 @@ public class OverlayRemoveEvent extends LayersControlEvent {
 
   private static final long serialVersionUID = 5509563423863560531L;
 
+  private final String removedLayerId;
+
   public OverlayRemoveEvent(LeafletMap source, boolean fromClient,
-      @EventData("event.detail.layer.options.uuid") String layerId,
-      @EventData("event.detail.name") String name) {
+      @EventData("event.detail.target.options.uuid") String layerId,
+      @EventData("event.detail.name") String name,
+      @EventData("event.detail.layer.options.uuid") String removedLayerId) {
     super(source, fromClient, layerId, LayerControlEventType.overlayremove, name);
+    this.removedLayerId = removedLayerId;
   }
 
+  /**
+   *
+   * @return The uuid of the removed layer, pay attention that this is the actual UUID of the removed layer since
+   * {@link layerId} is the UUID of the leafletmap.
+   */
+  public String getRemovedLayerId() {
+    return removedLayerId;
+  }
 }
