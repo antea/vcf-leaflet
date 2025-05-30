@@ -109,3 +109,14 @@
   -moz-filter: grayscale(100%);
   filter: grayscale(100%);
 }
+
+/* Gives a white background to the map*/
+:host(.whitebg) .leaflet-container {
+  background-color:  white !important;
+}
+
+/* Gives a black background to the map*/
+:host(.blackbg) .leaflet-container {
+  background-color:  black !important;
+}
+
