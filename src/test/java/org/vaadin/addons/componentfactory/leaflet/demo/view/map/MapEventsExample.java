@@ -79,6 +79,7 @@ public class MapEventsExample extends ExampleContainer {
             Notification.show("map gets initialized ", 2000, Position.TOP_CENTER);
         });
 
+        leafletMap.setWhiteBackground();
         addToContent(leafletMap);
     }
 
@@ -88,5 +89,4 @@ public class MapEventsExample extends ExampleContainer {
         sb.append(leafletEvent.getType());
         eventLogs.setValue(sb.toString());
     }
-
 }

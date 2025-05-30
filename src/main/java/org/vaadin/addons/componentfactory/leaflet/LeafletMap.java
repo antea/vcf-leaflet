@@ -84,6 +84,8 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
         SupportsClientRemoveEvents, SupportsClientCreateEvents, SupportsClientEditEvents, HasSize, HasTheme, HasStyle {
 
     private static final long serialVersionUID = 3789693345308589828L;
+    public static final String WHITE_BG_CLASS = "whitebg";
+    public static final String BLACK_BG_CLASS = "blackbg";
 
     private final Logger logger = LoggerFactory.getLogger(LeafletMap.class);
 
@@ -528,5 +530,21 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
      */
     public void fitToInnerLayerBounds() {
         getElement().callJsFunction("fitToInnerLayerBounds");
+    }
+
+    /**
+     * Sets the background of the map to white.
+     */
+    public void setWhiteBackground() {
+        addClassName(WHITE_BG_CLASS);
+        removeClassName(BLACK_BG_CLASS);
+    }
+
+    /**
+     * Sets the background of the map to black.
+     */
+    public void setBlackBackground() {
+        addClassName(BLACK_BG_CLASS);
+        removeClassName(WHITE_BG_CLASS);
     }
 }
