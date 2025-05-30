@@ -59,6 +59,15 @@ public class GeomanUtils {
     }
 
     /**
+     * Disables the drawing mode on the specified Leaflet map.
+     *
+     * @param leafletMap the Leaflet map on which to disable drawing mode
+     */
+    public static void disableDraw(LeafletMap leafletMap) {
+        leafletMap.executeJs(leafletMap, "pm.disableDraw");
+    }
+
+    /**
      * We can specify the icon to be used for marker creation
      * @param leafletMap LeafletMap to be modified
      * @param icon the new icon for markers
