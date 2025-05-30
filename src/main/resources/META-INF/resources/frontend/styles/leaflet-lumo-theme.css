@@ -94,13 +94,18 @@
   color: white;
 }
 
-.leaflet-div-icon span{
+.leaflet-div-icon span {
   display: block;
   border-radius: 5px;
-  background-color: rgba(34, 34, 34, 0.4);
+  background-color: var(--lumo-shade-40pct);
+  font-size: var(--lumo-font-size-s);
   color: white;
   width: 80px;
   text-align: center;
+}
+
+.leaflet-div-icon span a {
+  color: var(--lumo-primary-contrast-color);
 }
 
 /* Style for making TileLayers grayscale */
