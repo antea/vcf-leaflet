@@ -42,13 +42,11 @@ public class MarkerDivIconExample extends ExampleContainer {
 
 		Marker marker = new Marker(options.getCenter());
 		DivIcon icon = new DivIcon();
-		icon.setHtml("<img src=\"images/marker-icon-demo.png\" /><span>Hello I am a written text</span>");
+		icon.setHtml("<img src=\"images/marker-icon-demo.png\" /><span>Hello I am a written text  <a href=\"#\">a link too</a></span>");
 		marker.setIcon(icon);
 		marker.setDraggable(true);
 		marker.bindPopup("Hey, I'm a DivIcon, drag me if you want");
-		marker.onClick((e) -> {
-			Notification.show("You click the marker.", 3000, Position.TOP_CENTER);
-		});
+		marker.onClick((e) -> Notification.show("You click the marker.", 3000, Position.TOP_CENTER));
 
 		marker.addTo(leafletMap);
 
