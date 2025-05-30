@@ -115,6 +115,7 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                 if (ShapeType.MARKER.equals(e.getShape())) {
                     CircleMarker marker = new CircleMarker(e.getLatLng());
                     leafletMap.replaceLayer(e.getChild().getUuid(), marker);
+                    GeomanUtils.disableDraw(leafletMap);
                 }
             });
         });
