@@ -17,23 +17,23 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 
 /**
  * <h2>Leaflet.markercluster</h2>
- * 
+ *
  * Web component: <a href=
  * "https://www.npmjs.com/package/leaflet.markercluster">https://www.npmjs.com/package/leaflet.markercluster</a><br>
  * <br>
- * 
+ *
  * Provides Beautiful Animated Marker Clustering functionality for
  * LeafletMap.<br>
  * <br>
- * 
- * 
+ *
+ *
  * @author <strong>Gabor Kokeny</strong> Email:
  *         <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
  * @since 2020-05-26
  * @version 1.0
  */
 @NpmPackage(value = "leaflet.markercluster", version = "1.5.3")
-@JsModule("leaflet.markercluster/dist/leaflet.markercluster-src.js")
+@JsModule("./markercluster-base.js")
 @CssImport(value = "leaflet.markercluster/dist/MarkerCluster.css", themeFor = "leaflet-map")
 @CssImport(value = "leaflet.markercluster/dist/MarkerCluster.Default.css", themeFor = "leaflet-map")
 @Getter
@@ -61,27 +61,27 @@ public class MarkerClusterGroup extends FeatureGroup {
 
     /**
      * Fired when the user clicks (or taps) the marker cluster
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
     public void onClusterClick(LeafletEventListener<LeafletEvent> listener) {
         on(MarkerClusterEventType.clusterclick, listener);
     }
-    
+
     /**
      * Fired when the mouse enters the marker cluster
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
     public void onClusterMouseOver(LeafletEventListener<LeafletEvent> listener) {
         on(MarkerClusterEventType.clustermouseover, listener);
     }
-    
+
     /**
      * Fired when the mouse leaves the marker cluster
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
@@ -91,28 +91,28 @@ public class MarkerClusterGroup extends FeatureGroup {
 
     /**
      * Fires when marker clustering/unclustering animation has completed
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
     public void onAnimationEnd(LeafletEventListener<LeafletEvent> listener) {
         on(MarkerClusterEventType.animationend, listener);
     }
-    
+
 
     /**
      * Fires when overlapping markers get spiderified (Contains cluster and markers attributes)
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
     public void onSpiderfied(LeafletEventListener<LeafletEvent> listener) {
         on(MarkerClusterEventType.spiderfied, listener);
     }
-    
+
     /**
      * Fires when overlapping markers get unspiderified (Contains cluster and markers attributes)
-     * 
+     *
      * @param listener
      *            the listener to call when the event occurs, not {@code null}
      */
@@ -120,7 +120,7 @@ public class MarkerClusterGroup extends FeatureGroup {
         on(MarkerClusterEventType.unspiderfied, listener);
     }
 
-    
+
     @Override
     public String getPane() {
         return getClusterPane();
@@ -189,5 +189,5 @@ public class MarkerClusterGroup extends FeatureGroup {
     public PathOptions getPolygonOptions() {
         return options.getPolygonOptions();
     }
-    
+
 }
