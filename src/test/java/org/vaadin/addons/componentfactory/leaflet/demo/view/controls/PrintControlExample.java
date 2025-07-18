@@ -9,7 +9,7 @@ import org.vaadin.addons.componentfactory.leaflet.demo.components.ExampleContain
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePosition;
-import org.vaadin.addons.componentfactory.leaflet.plugins.print.BigImageControl;
+import org.vaadin.addons.componentfactory.leaflet.plugins.print.EasyPrintControl;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
 @PageTitle("Print control")
@@ -25,13 +25,13 @@ public class PrintControlExample extends ExampleContainer {
         LeafletMap leafletMap = new LeafletMap(options);
         leafletMap.setBaseUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
 
-        BigImageControl bigImageControl = new BigImageControl();
-        bigImageControl.setPosition(LeafletControl.ControlPosition.topleft);
-        bigImageControl.addTo(leafletMap);
+        EasyPrintControl easyPrintControl = new EasyPrintControl();
+        easyPrintControl.setPosition(LeafletControl.ControlPosition.topleft);
+        easyPrintControl.addTo(leafletMap);
 
-        MousePosition mousePosition = new MousePosition();
+        /*MousePosition mousePosition = new MousePosition();
         mousePosition.setPosition(LeafletControl.ControlPosition.bottomleft);
-        mousePosition.addTo(leafletMap);
+        mousePosition.addTo(leafletMap);*/
         addToContent(leafletMap);
     }
 }

@@ -94,6 +94,7 @@ public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver
         // Map examples
         AppMenuItem.create("Map", new Icon(VaadinIcon.GLOBE)).addSubMenu(MapEventsExample.class)
                 .addSubMenu(MapMaxBoundsExample.class).addSubMenu(MapDarkThemeExample.class)
+                .addSubMenu(EasyPrintMapExample.class)
                 .addSubMenu(MapPollListenerExample.class).addSubMenu(MapGeolocationExample.class)
                 .addSubMenu(MapFunctionsExample.class).addSubMenu(MapConversionMethodsExample.class)
                 .addSubMenu(MapDialogExample.class)
