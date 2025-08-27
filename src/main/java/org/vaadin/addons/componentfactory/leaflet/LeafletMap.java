@@ -148,7 +148,9 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
             ZoomEvent.class, ZoomLevelsChangeEvent.class, ZoomStartEvent.class,
             // Geoman events:
             ClientLayerAddEvent.class, ClientLayerRemoveEvent.class, ClientLayerUpdateEvent.class,
-            ClientLayerDragEndEvent.class, ClientLayerUpdateInMapEvent.class);
+            ClientLayerDragEndEvent.class, ClientLayerUpdateInMapEvent.class,
+            //EasyPrint events:
+            EasyPrintFinishedEvent.class, EasyPrintStartedEvent.class);
 
     public LeafletMap() {
         this(new DefaultMapOptions());
@@ -255,7 +257,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        // set events to leaflet 
+        // set events to leaflet
         JsonArray jsonArray = Json.createArray();
         for (int i = 0; i < events.size(); i++) {
             JsonObject js = Json.createObject();

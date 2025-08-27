@@ -1,12 +1,24 @@
 import 'leaflet';
-import 'leaflet-easyprint';
+import './vcf-easyprint';
 
-// Funzione globale che viene chiamata da Java
-window.initEasyPrintMap = function(mapContainerElement, options = {
+class EasyPrintFinishedEvent extends CustomEvent {
+    constructor(event) {
+        super("easyPrint-finished", {detail: event});
+    }
+}
+
+class EasyPrintStartedEvent extends CustomEvent {
+    constructor(event) {
+        super("easyPrint-started", {detail: event});
+    }
+}
+
+// Global function called by Java method
+window.initEasyPrintMap = function (mapContainerElement, options = {
     baseUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    center:{lat:47.070121823,lng:19.2041015625} ,
-    zoom:7,
-    position:"topleft",
+    center: {lat: 47.070121823, lng: 19.2041015625},
+    zoom: 7,
+    position: "topleft",
     title: "Print",
     customWindowTitle: "Print",
     sizeModes: ["Current", "A4Landscape", "A4Portrait"],
@@ -17,19 +29,22 @@ window.initEasyPrintMap = function(mapContainerElement, options = {
     hideClasses: [],
     spinnerBgColor: "#ff8c00",
 }) {
-    // Se la mappa è già stata inizializzata su questo elemento, non fare nulla
+    // If the map was already initialized, return.
     if (mapContainerElement.map) {
         return;
     }
 
-    // 1. Inizializza la mappa Leaflet sull'elemento del light DOM
+    // Initialize the leaflet map in the light DOM
     const map = L.map(mapContainerElement).setView(options.center, options.zoom);
-    mapContainerElement.map = map; // Salva un riferimento alla mappa
+    mapContainerElement.map = map;
+
+    addEasyPrintPluginListener();
 
     L.tileLayer(options.baseUrl).addTo(map);
 
     // 2. Inizializza il plugin easyPrint sulla mappa appena creata
-    L.easyPrint({
+    // Salva un riferimento al plugin per poterlo chiamare in seguito
+    mapContainerElement.easyPrint = L.easyPrint({
         title: options.title,
         position: options.position,
         sizeModes: options.sizeModes,
@@ -42,4 +57,36 @@ window.initEasyPrintMap = function(mapContainerElement, options = {
         spinnerBgCOlor: options.spinnerBgColor,
         //customSpinnerClass: options.customSpinnerClass
     }).addTo(map);
+
+    mapContainerElement.print = function (filename, size) {
+        if (!mapContainerElement.easyPrint) {
+            console.error("EasyPrint non è stato inizializzato sull'elemento della mappa.");
+        }
+        mapContainerElement.easyPrint.printMap(size, filename);
+    };
+
+    mapContainerElement.addEasyPrintControl = function () {
+        if (!mapContainerElement.easyPrint) {
+            return;
+        }
+        mapContainerElement.easyPrint.addTo(map);
+    }
+
+    mapContainerElement.removeEasyPrintControl = function () {
+        if (!mapContainerElement.easyPrint) {
+            return;
+        }
+        mapContainerElement.easyPrint.remove();
+    }
+
+    function addEasyPrintPluginListener() {
+        map.on("easyPrint-finished", event => {
+            //Let's force the dispatch event on the standard leaflet-map.
+            document.querySelector("leaflet-map").dispatchEvent(new EasyPrintFinishedEvent(event));
+        });
+        map.on("easyPrint-start", event => {
+            //Let's force the dispatch event on the standard leaflet-map.
+            document.querySelector("leaflet-map").dispatchEvent(new EasyPrintStartedEvent(event));
+        });
+    }
 };

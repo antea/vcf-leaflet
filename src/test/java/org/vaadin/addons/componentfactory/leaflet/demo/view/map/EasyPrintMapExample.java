@@ -1,5 +1,7 @@
 package org.vaadin.addons.componentfactory.leaflet.demo.view.map;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.addons.componentfactory.leaflet.demo.LeafletDemoApp;
@@ -13,6 +15,18 @@ public class EasyPrintMapExample extends ExampleContainer {
     protected void initDemo() {
         EasyPrintMap easyPrintMap = new EasyPrintMap();
         //easyPrintMap.print();
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.add(new Button("Enable EasyPrint", event -> {
+            easyPrintMap.addEasyPrintControl();
+        }));
+        layout.add(new Button("Disable EasyPrint", event -> {
+            easyPrintMap.removeEasyPrintControl();
+        }));
+        layout.add(new Button("Print", event -> {
+            easyPrintMap.print("test", "A4Landscape");
+        }));
+        addToContent(layout);
         addToContent(easyPrintMap);
     }
 }
