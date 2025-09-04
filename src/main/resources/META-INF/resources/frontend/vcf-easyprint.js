@@ -46,7 +46,7 @@ L.Control.EasyPrint = L.Control.extend({
                     name: this.options.defaultSizeTitles.A4Portrait,
                     className: 'A4Portrait page'
                 }
-            };
+            }
             return sizeMode;
         }, this);
 
@@ -94,14 +94,14 @@ L.Control.EasyPrint = L.Control.extend({
             center: this._map.getCenter()
         };
         if (this.originalState.mapWidth === 'auto') {
-            this.originalState.mapWidth = this._map.getSize().x  + 'px'
+            this.originalState.mapWidth = this._map.getSize().x + 'px'
             this.originalState.widthWasAuto = true
         } else if (this.originalState.mapWidth.includes('%')) {
             this.originalState.percentageWidth = this.originalState.mapWidth
             this.originalState.widthWasPercentage = true
-            this.originalState.mapWidth = this._map.getSize().x  + 'px'
+            this.originalState.mapWidth = this._map.getSize().x + 'px'
         }
-        this._map.fire("easyPrint-start", { event: event });
+        this._map.fire("easyPrint-start", {event: event});
         if (!this.options.hidden) {
             this._togglePageSizeButtons({type: null});
         }
@@ -172,7 +172,7 @@ L.Control.EasyPrint = L.Control.extend({
     _pausePrint: function (sizeMode) {
         var plugin = this
         var loadingTest = setInterval(function () {
-            if(!plugin.options.tileLayer.isLoading()) {
+            if (!plugin.options.tileLayer.isLoading()) {
                 clearInterval(loadingTest);
                 plugin._printOpertion(sizeMode)
             }
@@ -204,8 +204,7 @@ L.Control.EasyPrint = L.Control.extend({
                         plugin.mapContainer.style.width = 'auto'
                     } else if (plugin.originalState.widthWasPercentage) {
                         plugin.mapContainer.style.width = plugin.originalState.percentageWidth
-                    }
-                    else {
+                    } else {
                         plugin.mapContainer.style.width = plugin.originalState.mapWidth;
                     }
                     plugin.mapContainer.style.height = plugin.originalState.mapHeight;
@@ -230,7 +229,7 @@ L.Control.EasyPrint = L.Control.extend({
     },
 
     _createSpinner: function (title, spinnerClass, spinnerColor) {
-        return `<html><head><title>`+ title + `</title></head><body><style>
+        return `<html><head><title>` + title + `</title></head><body><style>
       body{
         background: ` + spinnerColor + `;
       }
@@ -302,7 +301,7 @@ L.Control.EasyPrint = L.Control.extend({
         }
       }
       </style>
-    <div class="`+spinnerClass+`">Loading...</div></body></html>`;
+    <div class="` + spinnerClass + `">Loading...</div></body></html>`;
     },
 
     _createNewWindow: function (img, orientation, plugin) {
@@ -401,7 +400,7 @@ L.Control.EasyPrint = L.Control.extend({
         var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
         var ab = new ArrayBuffer(byteString.length);
         var dw = new DataView(ab);
-        for(var i = 0; i < byteString.length; i++) {
+        for (var i = 0; i < byteString.length; i++) {
             dw.setUint8(i, byteString.charCodeAt(i));
         }
         return new Blob([ab], {type: mimeString});
@@ -441,6 +440,6 @@ L.Control.EasyPrint = L.Control.extend({
 
 });
 
-L.easyPrint = function(options) {
+L.easyPrint = function (options) {
     return new L.Control.EasyPrint(options);
 };
