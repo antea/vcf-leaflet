@@ -150,7 +150,7 @@ public final class LeafletMap extends Component implements MapModifyStateFunctio
             ClientLayerAddEvent.class, ClientLayerRemoveEvent.class, ClientLayerUpdateEvent.class,
             ClientLayerDragEndEvent.class, ClientLayerUpdateInMapEvent.class,
             //EasyPrint events:
-            EasyPrintFinishedEvent.class, EasyPrintStartedEvent.class);
+            EasyPrintFinishedEvent.class, EasyPrintStartedEvent.class, EasyPrintErrorEvent.class);
 
     public LeafletMap() {
         this(new DefaultMapOptions());

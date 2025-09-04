@@ -7,5 +7,7 @@ public enum EasyPrintEventType implements LeafletEventType {
 
     started,
 
-    finished;
+    finished,
+
+    error;
 }

@@ -23,6 +23,7 @@ L.Control.EasyPrint = L.Control.extend({
     },
 
     onAdd: function () {
+        this.leafletMapCustomComponent = document.querySelector('leaflet-map');
         this.mapContainer = this._map.getContainer();
         this.options.sizeModes = this.options.sizeModes.map(function (sizeMode) {
             if (sizeMode === 'Current') {
@@ -142,6 +143,7 @@ L.Control.EasyPrint = L.Control.extend({
                 plugin._resizeAndPrintMap(sizeMode);
             })
             .catch(function (error) {
+                plugin._dispatchPrintMapError(error);
                 console.error('oops, something went wrong!', error);
             });
     },
@@ -216,6 +218,7 @@ L.Control.EasyPrint = L.Control.extend({
                 plugin._map.fire("easyPrint-finished");
             })
             .catch(function (error) {
+                plugin._dispatchPrintMapError(error);
                 console.error('Print operation failed', error);
             });
     },
@@ -334,6 +337,12 @@ L.Control.EasyPrint = L.Control.extend({
             outerContainer.parentNode.insertBefore(mapDiv, outerContainer);
             outerContainer.parentNode.removeChild(blankDiv);
             outerContainer.parentNode.removeChild(outerContainer);
+        }
+    },
+
+    _dispatchPrintMapError(error) {
+        if (this.leafletMapCustomComponent) {
+            this.leafletMapCustomComponent.dispatchEvent(new CustomEvent('easyPrint-error', {detail: error}));
         }
     },
 
