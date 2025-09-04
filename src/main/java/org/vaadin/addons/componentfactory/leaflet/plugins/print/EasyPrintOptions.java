@@ -11,6 +11,7 @@ import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 @Getter
 public class EasyPrintOptions extends DefaultMapOptions {
 
+    // Size current is not working, consider to remove it from the sizeModes, for now.
     public static final String SIZE_CURRENT = "Current";
     // there is a bug in easyprint https://github.com/rowanwins/leaflet-easyPrint/issues/105
     public static final String SIZE_A4_LANDSCAPE = "A4Landscape";
@@ -28,7 +29,7 @@ public class EasyPrintOptions extends DefaultMapOptions {
     private Boolean exportOnly = false;
     private String filename = "map";
     private Boolean hidden = false;
-    private Boolean hideControlContainer = false;
+    private Boolean hideControlContainer = true;
     private String[] hideClasses = {};
     //private String spinnerBgColor = "#ff8c00";
     //private String customSpinnerClass = "epLoader";

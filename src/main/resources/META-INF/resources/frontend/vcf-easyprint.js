@@ -131,7 +131,7 @@ L.Control.EasyPrint = L.Control.extend({
             .then(function (dataUrl) {
                 plugin.blankDiv = document.createElement("div");
                 var blankDiv = plugin.blankDiv;
-                plugin.outerContainer.parentElement.insertBefore(blankDiv, plugin.outerContainer);
+                plugin.outerContainer.parentNode.insertBefore(blankDiv, plugin.outerContainer);
                 blankDiv.className = 'epHolder';
                 blankDiv.style.backgroundImage = 'url("' + dataUrl + '")';
                 blankDiv.style.position = 'absolute';
@@ -392,7 +392,7 @@ L.Control.EasyPrint = L.Control.extend({
       background-color: #757570;
       cursor: pointer;
     }`;
-        document.body.appendChild(css);
+        this.mapContainer.appendChild(css);
     },
 
     _dataURItoBlob: function (dataURI) {
@@ -421,15 +421,25 @@ L.Control.EasyPrint = L.Control.extend({
     },
 
     _toggleControls: function (show) {
-        var controlContainer = document.getElementsByClassName("leaflet-control-container")[0];
-        if (show) return controlContainer.style.display = 'block';
-        controlContainer.style.display = 'none';
+        const divs = this.mapContainer.querySelectorAll('div');
+        var controlContainer = Array.from(divs).find(e => e.className === "leaflet-control-container");
+        if (controlContainer) {
+            if (show) return controlContainer.style.display = 'block';
+            controlContainer.style.display = 'none';
+        } else {
+            console.warn(`_toggleControls: Cannot find controlContainer.`);
+        }
     },
     _toggleClasses: function (classes, show) {
+        const divs = this.mapContainer.querySelectorAll('div');
         classes.forEach(function (className) {
-            var div = document.getElementsByClassName(className)[0];
-            if (show) return div.style.display = 'block';
-            div.style.display = 'none';
+            var div = Array.from(divs).find(e => e.className === className);
+            if (div) {
+                if (show) return div.style.display = 'block';
+                div.style.display = 'none';
+            } else {
+                console.warn(`_toggleClasses: Cannot find div with className: ${className}`);
+            }
         });
     },
 
