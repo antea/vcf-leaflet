@@ -34,28 +34,13 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
-
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenu;
 import org.vaadin.addons.componentfactory.leaflet.demo.components.AppMenuItem;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.controls.*;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.layers.MultipleBaseLayersExample;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.map.*;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.DivOverlayStyleExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkerDivIconExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkerMethodCallExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersAddAndRemoveExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersChangingIconExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersEventsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersGroupExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersRemoveOnClickExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersSimpleExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.MarkersWithEventsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.FlyToPolygonBoundsExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.PathSimpleExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.Paths3000Example;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.PathsEventPropagationExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.PathsStyleExample;
-import org.vaadin.addons.componentfactory.leaflet.demo.view.path.TypeOfPathsExample;
+import org.vaadin.addons.componentfactory.leaflet.demo.view.marker.*;
+import org.vaadin.addons.componentfactory.leaflet.demo.view.path.*;
 import org.vaadin.addons.componentfactory.leaflet.demo.view.plugins.*;
 
 @CssImport(value = "styles/demo-applayout.css", themeFor = "vaadin-app-layout")
@@ -94,7 +79,6 @@ public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver
         // Map examples
         AppMenuItem.create("Map", new Icon(VaadinIcon.GLOBE)).addSubMenu(MapEventsExample.class)
                 .addSubMenu(MapMaxBoundsExample.class).addSubMenu(MapDarkThemeExample.class)
-                .addSubMenu(EasyPrintMapExample.class)
                 .addSubMenu(MapPollListenerExample.class).addSubMenu(MapGeolocationExample.class)
                 .addSubMenu(MapFunctionsExample.class).addSubMenu(MapConversionMethodsExample.class)
                 .addSubMenu(MapDialogExample.class)

@@ -28,10 +28,6 @@ public class PrintControlExample extends ExampleContainer {
         EasyPrintControl easyPrintControl = new EasyPrintControl();
         easyPrintControl.setPosition(LeafletControl.ControlPosition.topleft);
         easyPrintControl.addTo(leafletMap);
-
-        /*MousePosition mousePosition = new MousePosition();
-        mousePosition.setPosition(LeafletControl.ControlPosition.bottomleft);
-        mousePosition.addTo(leafletMap);*/
         addToContent(leafletMap);
     }
 }

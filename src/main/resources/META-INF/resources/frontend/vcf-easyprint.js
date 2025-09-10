@@ -1,6 +1,16 @@
-import domtoimage from './antea_domtoimage';
+import domtoimage from 'dom-to-image';
 import fileSaver from 'file-saver';
 
+/**
+ * VCF EasyPrint is an adaptation from leaflet-easyprint (https://github.com/rowanwins/leaflet-easyPrint),
+ * necessary since that project seems to be no longer maintained, and it is not working anymore.
+ * Specifically, we needed to rewrite the logic to toggle the controls from the map when printing,
+ * and adding the css style of the buttons in the right place: since leaflet-map is a custom element, any additional
+ * style needed in any of its children needs to be added to the shadow root.
+ * We also added a custom event that is fired when there are errors that occurs in dom-to-image.
+ */
+
+// This one transparent pixel is needed from domtoimage as a placeholder when an image is not loaded.
 const oneTransparentPixel = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAEElEQVR4AQEFAPr/ACgF7QACjgEbFRk/8QAAAABJRU5ErkJggg==";
 L.Control.EasyPrint = L.Control.extend({
     options: {
