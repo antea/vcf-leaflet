@@ -10,27 +10,27 @@ import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEven
 
 /**
  * <h2>Leaflet.Control.FullScreen</h2>
- * 
+ *
  * Web component: <a href=
  * "https://www.npmjs.com/package/leaflet.fullscreen">https://www.npmjs.com/package/leaflet.fullscreen</a><br>
  * <br>
- * 
+ *
  * Simple plugin for Leaflet that adds fullscreen button to your maps.<br>
  * <br>
- * 
- * 
+ *
+ *
  * If your map have a zoomControl the fullscreen button will be added at the
  * bottom of this one.<br>
  * <br>
- * 
+ *
  * If your map doesn't have a zoomContron the fullscreen button will be added to
  * topleft corner of the map (same as the zoomcontrol).<br>
  * <br>
- * 
+ *
  * If you want to use the plugin on a map embedded in an iframe, don't forget to
  * set allowfullscreen attribute on your iframe.<br>
  * <br>
- * 
+ *
  * <h3>FullScreen options</h3>
  * <ul>
  * <li><b>position</b> - change the position of the button can be topleft,
@@ -47,22 +47,22 @@ import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEven
  * <li><b>fullscreenElement</b> - Dom element to render in full screen, false by
  * default, fallback to map._container</li>
  * </ul>
- * 
+ *
  * *
  * <h3>FullScreen events</h3>
  * <ul>
  * <li><b>enterFullscreen</b> - event is fired when entering fullscreen</li>
  * <li><b>exitFullscreen</b> - events is fired when exiting fullscreen</li>
  * </ul>
- * 
+ *
  * <h3>Basic Usage</h3>
- * 
+ *
  * <pre>
  * FullScreenControl fullScreenControl = new FullScreenControl();
  * fullScreenControl.addTo(leafletMap);
  * </pre>
- * 
- * 
+ *
+ *
  * @author <strong>Gabor Kokeny</strong> Email:
  *         <a href='mailto=kokeny19@gmail.com'>kokeny19@gmail.com</a>
  * @since 2020-05-26
