@@ -25,4 +25,5 @@ public class EasyPrintOptions extends DefaultMapOptions {
     private Boolean hidden = false;
     private Boolean hideControlContainer = true;
     private String[] hideClasses = {};
+    private String[] hideClassesLeafletMap = {};
 }

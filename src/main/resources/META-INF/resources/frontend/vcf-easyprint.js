@@ -23,6 +23,7 @@ L.Control.EasyPrint = L.Control.extend({
         tileWait: 500,
         hideControlContainer: true,
         hideClasses: [],
+        hideClassesLeafletMap: [],
         customWindowTitle: window.document.title,
         spinnerBgCOlor: '#0DC5C1',
         customSpinnerClass: 'epLoader',
@@ -94,7 +95,9 @@ L.Control.EasyPrint = L.Control.extend({
             this.options.filename = filename
         }
         if (!this.options.exportOnly) {
-            this._page = window.open("", "_blank", 'toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=10, top=10, width=200, height=250, visible=none');
+            // We leave the URL blank instead of empty to avoid the writing "about:blank" in the footer or the header of
+            // the print in some browsers (Chrome).
+            this._page = window.open(" ", "_blank", 'toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=10, top=10, width=200, height=250, visible=none');
             this._page.document.write(this._createSpinner(this.options.customWindowTitle, this.options.customSpinnerClass, this.options.spinnerBgCOlor));
         }
         this.originalState = {
@@ -122,6 +125,9 @@ L.Control.EasyPrint = L.Control.extend({
         }
         if (this.options.hideClasses) {
             this._toggleClasses(this.options.hideClasses);
+        }
+        if (this.options.hideClassesLeafletMap) {
+            this._toggleLeafletMapClasses(this.options.hideClassesLeafletMap);
         }
         var sizeMode = typeof event !== 'string' ? event.target.className : event;
         if (sizeMode === 'CurrentSize') {
@@ -168,6 +174,7 @@ L.Control.EasyPrint = L.Control.extend({
             .finally(() => {
                 plugin._toggleControls(true);
                 plugin._toggleClasses(plugin.options.hideClasses, true);
+                plugin._toggleLeafletMapClasses(plugin.options.hideClassesLeafletMap, true);
 
                 if (plugin.outerContainer) {
                     if (plugin.originalState.widthWasAuto) {
@@ -474,6 +481,16 @@ L.Control.EasyPrint = L.Control.extend({
                 console.warn(`_toggleClasses: Cannot find div with className: ${className}`);
             }
         });
+    },
+    _toggleLeafletMapClasses: function (classes, show) {
+        if (!this.leafletMapCustomComponent) {
+            return;
+        }
+        if (show) {
+            this.leafletMapCustomComponent.classList.add(...classes);
+            return;
+        }
+        this.leafletMapCustomComponent.classList.remove(...classes);
     },
 
     _a4PageSize: {
