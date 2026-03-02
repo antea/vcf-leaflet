@@ -42,10 +42,10 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.addons.componentfactory.leaflet.controls.LeafletControl;
 import org.vaadin.addons.componentfactory.leaflet.layer.Identifiable;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
+import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyDownEvent;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyPressEvent;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.KeyUpEvent;
-import org.vaadin.addons.componentfactory.leaflet.layer.events.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.supports.*;
 import org.vaadin.addons.componentfactory.leaflet.layer.events.types.LeafletEventType;
 import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
@@ -78,7 +78,8 @@ import java.util.stream.Stream;
 @CssImport(value = "leaflet/dist/leaflet.css", themeFor = "leaflet-map")
 @CssImport(value = "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css", themeFor = "leaflet-map")
 @CssImport(value = "./styles/leaflet-lumo-theme.css", themeFor = "leaflet-map")
-@NpmPackage(value = "@geoman-io/leaflet-geoman-free", version = "2.14.2")
+@CssImport(value = "./styles/leaflet-geoman-fixed.css", themeFor = "leaflet-map")
+@NpmPackage(value = "@geoman-io/leaflet-geoman-free", version = "2.19.2")
 public final class LeafletMap extends Component implements MapModifyStateFunctions, MapGetStateFunctions, GeolocationFunctions, MapConversionFunctions, SupportsMouseEvents,
         SupportsMapEvents, SupportsLocationEvents, SupportsKeyboardEvents, SupportsLayerEvents,
         SupportsClientRemoveEvents, SupportsClientCreateEvents, SupportsClientEditEvents, HasSize, HasTheme, HasStyle {

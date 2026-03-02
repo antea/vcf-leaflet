@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A Geoman SVG Fixer</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        textarea { width: 100%; height: 250px; font-family: monospace; margin-bottom: 10px; }
+        button { padding: 10px 20px; font-size: 16px; background: #0064f0; color: white; border: none; cursor: pointer; }
+        button:hover { background: #004ab5; }
+        #status { margin-top: 10px; font-weight: bold; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+
+<p>Geoman SVG urls breaks when included in Vaadin addon, this will transform them to save base64 encoding...</p>
+<h2>1. Paste raw Geoman CSS here:</h2>
+<label for="inputCss">Input CSS</label><textarea id="inputCss" placeholder="Paste the CSS containing data:image/svg+xml..."></textarea>
+
+<button onclick="convertToBase64()">Translate to Base64</button>
+<div id="status"></div>
+
+<h2>2. Copy your fixed CSS:</h2>
+<label for="outputCss">Output CSS</label><textarea id="outputCss" placeholder="Your safe, encoded CSS will appear here..."></textarea>
+
+<script>
+    // Safely decodes URL strings, even if they have weird characters
+    function safeDecode(str) {
+        try {
+            return decodeURIComponent(str);
+        } catch (e) {
+            // Fallback: manually decode only valid %XX hex sequences
+            return str.replace(/%([0-9A-Fa-f]{2})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16)));
+        }
+    }
+
+    // Safely converts XML strings to Base64 without call-stack limits
+    function utf8_to_b64(str) {
+        const bytes = new TextEncoder().encode(str);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+    }
+
+    function convertToBase64() {
+        const input = document.getElementById('inputCss').value;
+        const outputArea = document.getElementById('outputCss');
+        const status = document.getElementById('status');
+
+        if (!input) {
+            status.innerHTML = '<span class="error">Please paste some CSS first!</span>';
+            return;
+        }
+
+        try {
+            // We must match up to </svg> because the internal SVG may contain ')',
+            const regex = /url\(['"]?(data:image\/svg\+xml,.*?<\/svg>(?:%0A|\s)*)['"]?\)/gis;
+            let count = 0;
+
+            outputArea.value = input.replace(regex, (match, svgDataUrl) => {
+                count++;
+
+                // Strip the prefix
+                const rawSvg = svgDataUrl.replace(/^data:image\/svg\+xml,/, '');
+
+                // Decode and encode safely
+                const decodedSvg = safeDecode(rawSvg);
+                const base64Svg = utf8_to_b64(decodedSvg);
+
+                // Return the Vite-safe CSS rule wrapped in double quotes
+                return `url("data:image/svg+xml;base64,${base64Svg}")`;
+            });
+
+            if (count > 0) {
+                status.innerHTML = `<span class="success">✅ Success! Converted ${count} SVGs to Base64.</span>`;
+            } else {
+                status.innerHTML = `<span class="error">⚠️ No SVGs found. Make sure the input contains 'data:image/svg+xml' and '&lt;/svg&gt;'.</span>`;
+            }
+
+        } catch (e) {
+            status.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            console.error(e);
+        }
+    }
+</script>
+</body>
+</html>
