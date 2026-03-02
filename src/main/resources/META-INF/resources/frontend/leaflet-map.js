@@ -27,8 +27,6 @@ import {html, PolymerElement} from "@polymer/polymer/polymer-element.js";
 import {ThemableMixin} from "@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js";
 import './leaflet-base.js';
 import './leaflet-more.js'
-// import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.js"; for geoman > 1.15
-import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.min.js";
 
 import {LeafletTypeConverter} from "./leaflet-type-converter.js";
 import {DomUtil} from "leaflet/dist/leaflet-src.esm";
