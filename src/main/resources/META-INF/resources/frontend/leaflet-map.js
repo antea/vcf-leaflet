@@ -177,6 +177,19 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
         }
       }, this)
     }
+    if ("pm.enableEditing" === functionName) {
+      //for each editable layer set the options to allowRemoval, allowEditing, allowDraggable, allowCutting
+      target.pm.globalOptions.layerGroup.eachLayer(function(layer){
+          layer.pm.setOptions({
+            allowRemoval: true,
+            allowEditing: true,
+            draggable : true,
+            allowCutting : true,
+            allowRotation : true
+          })
+      })
+      return;
+    }
 
     let pm = target.pm;
     let simpleFunctionName = functionName.replace("pm.", "");
