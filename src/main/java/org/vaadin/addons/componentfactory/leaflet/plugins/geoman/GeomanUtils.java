@@ -22,7 +22,10 @@ import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.options.GeomanG
 import org.vaadin.addons.componentfactory.leaflet.types.Icon;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * <h2>Leaflet.geoman</h2> Leaflet Plugin For Creating And Editing Geometry Layers.
@@ -60,7 +63,6 @@ public class GeomanUtils {
 
     /**
      * Disables the drawing mode on the specified Leaflet map.
-     *
      * @param leafletMap the Leaflet map on which to disable drawing mode
      */
     public static void disableDraw(LeafletMap leafletMap) {
@@ -137,7 +139,8 @@ public class GeomanUtils {
      */
     public static void setEditableFeatureGroup(LeafletMap leafletMap, FeatureGroup featureGroup) {
         // this will create all new layers in the FeatureGroup layer
-        leafletMap.executeJs(leafletMap, "pm.setGlobalOptions", new GeomanGlobalOptions(featureGroup));
+        leafletMap.executeJs(leafletMap, "pm.setGlobalOptions", new GeomanGlobalOptions(featureGroup, false, false, false, false, false));
+        leafletMap.executeJs(leafletMap, "pm.applyGlobalOptions");
     }
 
     /**
