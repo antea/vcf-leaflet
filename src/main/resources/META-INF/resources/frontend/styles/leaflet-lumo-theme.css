@@ -94,6 +94,7 @@
   color: white;
 }
 
+/* Style for the text of the markers */
 .leaflet-div-icon span {
   display: block;
   border-radius: 5px;
@@ -101,7 +102,8 @@
   font-size: var(--lumo-font-size-s);
   color: white;
   width: 80px;
-  text-align: center;
+  text-align: left;
+  padding: 0 var(--lumo-space-s) 0 var(--lumo-space-s);
 }
 
 .leaflet-div-icon span a {
