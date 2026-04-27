@@ -22,12 +22,12 @@ import org.vaadin.addons.componentfactory.leaflet.types.Point;
 @Route(value = "map/crs", layout = LeafletDemoApp.class)
 public class MapCrsExample extends ExampleContainer {
     public static final String pidDescription = "LFI PLANIMETRIA GENERALE_05PB";
-    public static final String pidName = "6692552428045889120";
-    public static final double MIN_X = 309.318027212648;
-    public static final double MIN_Y = 352.775475776667;
-    public static final double WIDTH = 1398.35408166923;
-    public static final double HEIGHT = 841.052374599691;
-    public static final double[] crs = {0.000715126456960237, -0.221201504874512, -0.000715126456960237, 1.05300847847737};
+    public static final String pidName = "-1270486853";
+    public static final double MIN_X = 0;
+    public static final double MIN_Y = 0;
+    public static final double WIDTH = 841.000000197373;
+    public static final double HEIGHT = 594.000000030395;
+    public static final double[] crs = {0.00118906064181369, 0, -0.00118906064181369, 0.853151010636736};
     public static final int MAX_ZOOM = 5;
 
     @Override
