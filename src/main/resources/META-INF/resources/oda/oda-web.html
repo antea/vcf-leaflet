@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>DWG/DXF Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+
+    <script type="text/javascript">
+      var initialUrl = new URLSearchParams(window.location.search).get('url');
+
+      var Module = {
+        FS: {},
+        arguments: [],
+        ASSETS_FOLDER: '/assets',
+        preRun: [
+          function () {
+            FS.mkdir(Module.ASSETS_FOLDER);
+          },
+        ],
+        postRun: [
+          function () {
+            Module.canvas = document.getElementById('canvas');
+            var appCore = new Module.App();
+
+            function Resize() {
+              Module.canvas.height = Module.canvas.clientHeight;
+              Module.canvas.width = Module.canvas.clientWidth;
+              appCore.Resize(Module.canvas.width, Module.canvas.height);
+            }
+
+            window.onresize = Resize;
+
+            Module.canvas.onwheel = function (ev) {
+              appCore.Zoom(-ev.deltaY * 0.01, ev.offsetX, ev.offsetY);
+              ev.preventDefault();
+            };
+
+            Module.canvas.onmousedown = function (ev) {
+              if (ev.buttons === 4) {
+                appCore.ZoomExtents();
+                ev.preventDefault();
+              }
+            };
+
+            Module.canvas.onmousemove = function (ev) {
+              if (ev.buttons === 1) appCore.Dolly(ev.movementX, ev.movementY);
+            };
+
+            function render() {
+              requestAnimationFrame(render);
+              appCore.Update();
+            }
+            render();
+
+            if (initialUrl) {
+              const fileName = initialUrl.split('/').pop().split('?')[0] || 'drawing.dwg';
+              fetch(initialUrl)
+                .then((res) => {
+                  if (!res.ok) throw new Error('HTTP ' + res.status);
+                  return res.arrayBuffer();
+                })
+                .then((buf) => new Uint8Array(buf))
+                .then((array) => {
+                  const path = Module.ASSETS_FOLDER + '/' + fileName;
+                  const { exists } = FS.analyzePath(path);
+                  if (!exists)
+                    Module.FS_createDataFile(Module.ASSETS_FOLDER, fileName, array, true, true, true);
+                  appCore.OpenFile(path);
+                  Resize();
+                  appCore.ZoomExtents();
+                  appCore.Update();
+                })
+                .catch((err) => console.error('Failed to load file:', err));
+            }
+          },
+        ],
+        print:    function (text) { console.log(text); },
+        printErr: function (text) { console.error(text); },
+        canvas: (function () {
+          var canvas = document.getElementById('canvas');
+          canvas.addEventListener('webglcontextlost', function (e) {
+            alert('WebGL context lost. You will need to reload the page.');
+            e.preventDefault();
+          }, false);
+          return canvas;
+        })(),
+        setStatus: function (text) {},
+        totalDependencies: 0,
+        monitorRunDependencies: function (left) {},
+      };
+
+      window.onerror = function () {
+        console.error('Exception thrown, see JavaScript console');
+      };
+    </script>
+    <script async type="text/javascript" src="DrawingWeb.js"></script>
+  </body>
+</html>

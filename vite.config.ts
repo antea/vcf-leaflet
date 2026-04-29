@@ -15,20 +15,39 @@ const customConfig: UserConfigFn = (env) => ({
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           const url = req.url ?? '';
-          if (!url.includes('/workers/') || !url.endsWith('.js')) {
-            return next();
+
+          // CAD workers
+          if (url.includes('/workers/') && url.endsWith('.js')) {
+            const filename = url.split('/').pop()!;
+            const filePath = resolve(
+              __dirname,
+              'frontend/generated/jar-resources/workers',
+              filename
+            );
+            if (!existsSync(filePath)) return next();
+            const content = readFileSync(filePath);
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Cache-Control', 'no-cache');
+            return res.end(content);
           }
-          const filename = url.split('/').pop()!;
-          const filePath = resolve(
-            __dirname,
-            'frontend/generated/jar-resources/workers',
-            filename
-          );
-          if (!existsSync(filePath)) return next();
-          const content = readFileSync(filePath);
-          res.setHeader('Content-Type', 'application/javascript');
-          res.setHeader('Cache-Control', 'no-cache');
-          res.end(content);
+
+          // ODA Emscripten files — serve raw to avoid Vite transforming import.meta.url
+          if (url.startsWith('/oda/')) {
+            const filename = url.split('/').pop()!;
+            const filePath = resolve(
+              __dirname,
+              'src/main/resources/META-INF/resources/oda',
+              filename
+            );
+            if (!existsSync(filePath)) return next();
+            const content = readFileSync(filePath);
+            const mime = filename.endsWith('.wasm') ? 'application/wasm' : 'application/javascript';
+            res.setHeader('Content-Type', mime);
+            res.setHeader('Cache-Control', 'no-cache');
+            return res.end(content);
+          }
+
+          next();
         });
       }
     }
