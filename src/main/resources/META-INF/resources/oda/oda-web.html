@@ -27,6 +27,7 @@
 
     <script type="text/javascript">
       var initialUrl = new URLSearchParams(window.location.search).get('url');
+      var fontUrl = new URLSearchParams(window.location.search).get('url');
 
       var Module = {
         FS: {},
@@ -72,6 +73,15 @@
             }
             render();
 
+            window.addEventListener('message', function (ev) {
+              var msg = ev.data;
+              if (!msg || !msg.cmd) return;
+              switch (msg.cmd) {
+                case 'dolly': appCore.Dolly(msg.dx, msg.dy); break;
+                case 'zoom':  appCore.Zoom(msg.delta, msg.cx, msg.cy); break;
+              }
+            });
+
             if (initialUrl) {
               const fileName = initialUrl.split('/').pop().split('?')[0] || 'drawing.dwg';
               fetch(initialUrl)
@@ -91,6 +101,34 @@
                   appCore.Update();
                 })
                 .catch((err) => console.error('Failed to load file:', err));
+
+                // Load font
+                fetch(fontUrl)
+                .then((res) => {
+                  if (!res.ok) throw new Error('HTTP ' + res.status);
+                  return res.arrayBuffer();
+                })
+                .then((arraybuffer) => new Uint8Array(arraybuffer))
+                .then((array) => {
+                  const folder = Module.ASSETS_FOLDER;
+                  const filePath = folder + name;
+                  const { exists } = FS.analyzePath(filePath);
+                  if (!exists)
+                    return Module.FS_createDataFile(
+                      folder,
+                      name,
+                      array,
+                      true,
+                      true,
+                      true
+                    );
+                })
+                .then(() => {
+                  if (/(.ttf|.ttc)$/.test(name)) {
+                    appCore.registerFontFileName(name);
+                  }
+                })
+                .catch((err) => console.error(err));
             }
           },
         ],
