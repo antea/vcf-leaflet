@@ -1,6 +1,8 @@
 package org.vaadin.addons.componentfactory.leaflet.layer.raster;
 
 import com.vaadin.flow.component.dependency.JsModule;
+import lombok.Getter;
+import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.annotations.LeafletArgument;
 import org.vaadin.addons.componentfactory.leaflet.layer.Layer;
 
@@ -17,9 +19,15 @@ public class OdaNativeLayer extends Layer {
     @LeafletArgument(index = 0)
     private String url;
 
+    @Getter
+    @Setter
+    @LeafletArgument(index = 1)
+    private String fontUrl;
+
     public OdaNativeLayer(String url) {
         super();
         this.url = url;
+        this.fontUrl = "/VAADIN/generated/jar-resources/oda/assets/arial.ttf";
     }
 
     public String getUrl() { return url; }

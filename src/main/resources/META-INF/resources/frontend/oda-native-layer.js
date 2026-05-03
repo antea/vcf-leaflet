@@ -54,8 +54,9 @@ function fileNameFromUrl(url) {
 
 L.OdaNativeLayer = L.Layer.extend({
 
-    initialize(url, options) {
+    initialize(url, fontUrl, options) {
         this._dwgUrl = url;
+        this._fontUrl = fontUrl;
         L.setOptions(this, options);
     },
 
@@ -135,6 +136,16 @@ L.OdaNativeLayer = L.Layer.extend({
         const { mod, appCore } = await loadOdaModule(canvas);
         this._appCore = appCore;
 
+        // Add Font
+        const fontResponse = await fetch(this._fontUrl);
+        if (!fontResponse.ok) throw new Error(`HTTP ${fontResponse.status}`);
+        const fontBuffer = await fontResponse.arrayBuffer();
+        const pathFont = ASSETS_DIR + '/' + "Arial.ttf";
+        const { fontExists } = FS.analyzePath(pathFont);
+        if (!fontExists) mod.FS_createDataFile(ASSETS_DIR, "Arial.ttf", new Uint8Array(fontBuffer), true, true, true);
+        appCore.registerFontFileName("Arial.ttf");
+
+        // Load DWG
         const fileName = fileNameFromUrl(this._dwgUrl);
         console.log('[OdaNativeLayer] fetching', this._dwgUrl, 'as', fileName);
         const response = await fetch(this._dwgUrl);
@@ -146,6 +157,14 @@ L.OdaNativeLayer = L.Layer.extend({
         if (!exists) mod.FS_createDataFile(ASSETS_DIR, fileName, new Uint8Array(buffer), true, true, true);
 
         appCore.OpenFile(path);
+
+        // Change the Background - TODO IGOR
+        const color = 0x000000;
+        // const color = 0xFFFFFF;
+        const device = appCore.getDevice();
+        device.setBackgroundColor(color);
+        device.setLogicalPalette(Module.odcmAcadPalette(color), 256);
+
         appCore.Resize(canvas.width, canvas.height);
         appCore.ZoomExtents();
         appCore.Update(); // settle the view state before reading it
@@ -165,7 +184,7 @@ L.OdaNativeLayer = L.Layer.extend({
             pixelWidth:  canvas.width,
             projection:  view.isPerspective() ? 1 : 0, // Projection.kPerspective=1, kParallel=0
         };
-        this._baseZoom      = this._map.getZoom();
+        this._baseZoom      = this._map.getZoom() + 2;
         this._initialCenter = this._map.getCenter();
 
         this._ready = true;
@@ -177,6 +196,8 @@ L.OdaNativeLayer = L.Layer.extend({
             requestAnimationFrame(render);
             appCore.Update();
         })();
+
+        this._syncView();
     },
 
     // Absolute view sync — mirrors dwg-native-layer's approach.

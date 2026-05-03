@@ -10,6 +10,8 @@ import org.vaadin.addons.componentfactory.leaflet.demo.components.ExampleContain
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.raster.OdaNativeLayer;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePosition;
+import org.vaadin.addons.componentfactory.leaflet.plugins.mouseposition.MousePositionOptions;
 import org.vaadin.addons.componentfactory.leaflet.types.CustomSimpleCrs;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLngBounds;
@@ -31,9 +33,14 @@ public class OdaNativeExample extends ExampleContainer {
         MapOptions options = new DefaultMapOptions();
         options.setSupportedCrs(CustomSimpleCrs.BaseCrs.L_CRS_Simple);
         options.setCustomSimpleCrs(customSimpleCrs);
+        options.setZoomAnimation(false);
 
         LeafletMap leafletMap = new LeafletMap(options);
 
+        MousePositionOptions mousePositionOptions = new MousePositionOptions();
+        mousePositionOptions.setPrefix("Lat ");
+        mousePositionOptions.setSeparator(" : Lon ");
+        new MousePosition(mousePositionOptions).addTo(leafletMap);
         new ScaleControl().addTo(leafletMap);
         LayersControl layersControl = new LayersControl();
         layersControl.addTo(leafletMap);

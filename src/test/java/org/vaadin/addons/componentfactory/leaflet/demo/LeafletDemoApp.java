@@ -87,6 +87,8 @@ public class LeafletDemoApp extends AppLayout implements AfterNavigationObserver
                 .addSubMenu(MapCrsExample.class)
                 .addSubMenu(DwgNativeExample.class)
                 .addSubMenu(CadSimpleViewerExample.class)
+                .addSubMenu(OdaNativeExample.class)
+                .addSubMenu(OdaWebViewerExample.class)
                 .addTo(appMenu);
 
         // Marker examples

@@ -301,6 +301,14 @@ export class LeafletTypeConverter {
      * @returns {*} a new Crs object, and add it to leaflet map
      */
     addCustomSimpleCrsFrom(name, min_x, min_y, max_x, max_y, a, b, c, d) {
+        // Normalize so that at zoom 0 (scale=256) the largest image dimension is exactly 256px.
+        // Without this, a large image exceeds 256px at zoom 0 and maxBounds blocks panning.
+        const maxDim = Math.max(Math.abs(a) * (max_x - min_x), Math.abs(c) * (max_y - min_y));
+        if (maxDim > 0) {
+            const norm = 1 / maxDim;
+            a *= norm; b *= norm; c *= norm; d *= norm;
+        }
+
         let thisConverter = this
         let projection = {
             project: function (latlng) {
