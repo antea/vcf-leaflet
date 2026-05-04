@@ -24,4 +24,7 @@ public class MousePositionOptions implements Serializable {
 
     // Weather to put the longitude first or not. Defaults to false
     private Boolean lngFirst = false;
+
+    // Weather to wrap longitude or not. Defaults to true
+    private Boolean wrapLng = true;
 }
