@@ -4,7 +4,7 @@
 
 	<groupId>org.vaadin.addons.antea</groupId>
 	<artifactId>vcf-leaflet</artifactId>
-	<version>23.4.0.20-ANTEA-SNAPSHOT</version>
+	<version>24.9.2.1-ANTEA-SNAPSHOT</version>
 	<name>Leaflet</name>
 	<description>Integration of Leaflet Map for Vaadin Flow</description>
 	<scm>
@@ -13,16 +13,16 @@
 		<developerConnection>scm:git:git@https://github.com/antea/vcf-leaflet.git</developerConnection>
 	</scm>
 	<properties>
-		<vaadin.version>23.4.0</vaadin.version>
+		<vaadin.version>24.9.2</vaadin.version>
 
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<drivers.dir>${project.basedir}/drivers</drivers.dir>
 
-		<jetty.version>12.0.14</jetty.version>
+		<jetty.version>11.0.14</jetty.version>
 
 		<maven-war-plugin.version>3.4.0</maven-war-plugin.version>
 	</properties>
@@ -189,18 +189,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Since we are using JDK11 and Servlet 4, we need a specific Jetty plugin for it
-			https://jetty.org/docs/jetty/12/programming-guide/maven-jetty/jetty-maven-plugin.html-->
 			<plugin>
-				<groupId>org.eclipse.jetty.ee8</groupId>
-				<artifactId>jetty-ee8-maven-plugin</artifactId>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
 				<configuration>
 					<scan>2</scan>
-					<httpConnector>
-						<!--host>localhost</host-->
-						<port>8080</port>
-					</httpConnector>
+                    <httpConnector>
+                        <!--host>localhost</host-->
+                        <port>9080</port>
+                    </httpConnector>
 					<systemProperties>
 						<vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
 					</systemProperties>
