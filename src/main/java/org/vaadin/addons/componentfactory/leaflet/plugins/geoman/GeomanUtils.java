@@ -139,7 +139,7 @@ public class GeomanUtils {
      */
     public static void setEditableFeatureGroup(LeafletMap leafletMap, FeatureGroup featureGroup) {
         // this will create all new layers in the FeatureGroup layer
-        leafletMap.executeJs(leafletMap, "pm.setGlobalOptions", new GeomanGlobalOptions(featureGroup, false, false, false, false, false));
+        leafletMap.executeJs(leafletMap, "pm.setGlobalOptions", new GeomanGlobalOptions(featureGroup, true, true, true, true, true));
         leafletMap.executeJs(leafletMap, "pm.applyGlobalOptions");
         if (null != featureGroup) { //it is null when editing is disabled
             leafletMap.executeJs(leafletMap, "pm.enableEditing");

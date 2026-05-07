@@ -83,6 +83,9 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     // init leaflet map
     let options = JSON.parse(this.mapOptions)
     options = this.leafletConverter.tryToSetCrs(options)
+    options.pmIgnore = false;
+    // 1. Set Opt-In immediately
+    L.PM.setOptIn(true);
     this.map = this.toLeafletMap(options);
   }
 
@@ -172,6 +175,8 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
       let thisLeafletMap = this;
       // every new Layer that is created by the user should have a pm:update listener to sync with the server
       this.map.on("pm:create", function (event) {
+        event.layer.options.pmIgnore = false; //make layer editable
+        L.PM.reInitLayer(event.layer)
         if (thisLeafletMap._isInteresting(event.layer)) {
           event.layer.on("pm:update", thisLeafletMap.onLayerEditedOnClient, this);
         }
@@ -180,13 +185,8 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     if ("pm.enableEditing" === functionName) {
       //for each editable layer set the options to allowRemoval, allowEditing, allowDraggable, allowCutting
       target.pm.globalOptions.layerGroup.eachLayer(function(layer){
-          layer.pm.setOptions({
-            allowRemoval: true,
-            allowEditing: true,
-            draggable : true,
-            allowCutting : true,
-            allowRotation : true
-          })
+          layer.options.pmIgnore = false; //make layer editable
+          L.PM.reInitLayer(layer);
       })
       return;
     }
