@@ -14,6 +14,7 @@
 
 package org.vaadin.addons.componentfactory.leaflet.layer.vectors;
 
+import lombok.Setter;
 import org.vaadin.addons.componentfactory.leaflet.annotations.LeafletArgument;
 import org.vaadin.addons.componentfactory.leaflet.types.LatLng;
 
@@ -29,7 +30,8 @@ public class CircleMarker extends Path {
 
     @LeafletArgument
     private final LatLng latlng;
-    private final double radius;
+    @Setter
+    private double radius;
 
     /**
      * Instantiates a circle marker object given a geographical point
@@ -67,5 +69,4 @@ public class CircleMarker extends Path {
     public double getRadius() {
         return radius;
     }
-
 }
