@@ -203,6 +203,42 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
         }, this);
         this._pmCreateRegistered = true;
       }
+      if (!this._layerAddRegistered) { //ensure we add the listener only once
+        this.map.on('layeradd', function (e) {
+          const addedLayer = e.layer;
+          if (addedLayer._pmTempLayer === true) {
+            return; // these are Geoman helper markers/draggers, we ignore them
+          }
+          //Safely access Geoman's tracked global editable layer group container
+          const editableGroup = this.map.pm && this.map.pm.globalOptions && this.map.pm.globalOptions.layerGroup;
+          if (!editableGroup) {
+            return; //editing is not on. we can return
+          }
+
+          //Helper function to recursively check if our editable layer group container
+          // holds this added layer inside any of its nested children/sub-groups
+          function isDescendantOf(parentContainer, layerToFind) {
+            let found = false;
+            if (typeof parentContainer.hasLayer === 'function' && parentContainer.hasLayer(layerToFind)) {
+              return true;
+            }
+            if (typeof parentContainer.eachLayer === 'function') {
+              parentContainer.eachLayer(function (subGroup) {
+                if (!found && subGroup instanceof L.LayerGroup) {
+                  if (isDescendantOf(subGroup, layerToFind)) {
+                    found = true;
+                  }
+                }
+              });
+            }
+            return found;
+          }
+          //If the layer being added belongs somewhere inside the editable layer group sub tree, pmIgnore false. otherwise pmIgnore true
+          let descendantOfEditableLayerGroup = isDescendantOf(editableGroup, addedLayer);
+          this.setPmIgnore(addedLayer, !descendantOfEditableLayerGroup);
+        }, this);
+        this._layerAddRegistered = true;
+      }
     }
     if ("pm.enableEditing" === functionName) {
       this.setPmIgnoreRecursively(target.pm.globalOptions.layerGroup, false);
