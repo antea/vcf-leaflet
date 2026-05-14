@@ -135,6 +135,15 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   }
 
   /**
+   * updates layer options to make it editable (pmIgnore false) or not editable (pmIgnore true) and reinits the given
+   * layer.
+   */
+  setPmIgnore(layer, pmIgnore) {
+    layer.options.pmIgnore = pmIgnore;
+    L.PM.reInitLayer(layer);
+  }
+
+  /**
    * this will call a specific function operation.functionName invoking it on the layer  operation.layerId
    */
   callLeafletFunction(operation) {
@@ -163,6 +172,18 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     }
   }
 
+  /**
+   * sets PmIgnore to the given value for all layers in the given container recursively and to the container itself.
+   */
+  setPmIgnoreRecursively(container, pmIgnore) {
+    this.setPmIgnore(container, pmIgnore)
+    if (container instanceof L.LayerGroup) {
+      container.eachLayer((layer) => { // Using arrow function preserves 'this'
+          this.setPmIgnoreRecursively(layer, pmIgnore);
+      });
+    }
+  }
+
   _callPMFunction(target, functionName, leafletArgs) {
     if ("pm.setMarkerDrawIcon" === functionName) {
       this._pmSetMarkerDrawIcon(target.pm, leafletArgs[0]);
@@ -183,11 +204,7 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
       }, this)
     }
     if ("pm.enableEditing" === functionName) {
-      //for each editable layer set the options to allowRemoval, allowEditing, allowDraggable, allowCutting
-      target.pm.globalOptions.layerGroup.eachLayer(function(layer){
-          layer.options.pmIgnore = false; //make layer editable
-          L.PM.reInitLayer(layer);
-      })
+      this.setPmIgnoreRecursively(target.pm.globalOptions.layerGroup, false);
       return;
     }
 
