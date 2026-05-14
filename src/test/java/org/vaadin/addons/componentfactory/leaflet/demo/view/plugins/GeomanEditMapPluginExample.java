@@ -30,6 +30,7 @@ import org.vaadin.addons.componentfactory.leaflet.layer.groups.LayerGroup;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.DefaultMapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.map.options.MapOptions;
 import org.vaadin.addons.componentfactory.leaflet.layer.ui.marker.Marker;
+import org.vaadin.addons.componentfactory.leaflet.layer.vectors.Circle;
 import org.vaadin.addons.componentfactory.leaflet.layer.vectors.CircleMarker;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.EditEventType;
 import org.vaadin.addons.componentfactory.leaflet.plugins.geoman.events.types.ShapeType;
@@ -67,7 +68,31 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         mousePositionOptions.setPrefix("Lat ");
         mousePositionOptions.setSeparator(" : Lon ");
         new MousePosition(mousePositionOptions).addTo(leafletMap);
-        leafletMap.addLayer(createRandomMarkers(DEFAULT_ICON, 4));
+
+        GeomanControlOptions geomanControlOptions = new GeomanControlOptions();
+        geomanControlOptions.setCutPolygon(false);
+        geomanControlOptions.setDrawCircleMarker(false);
+        GeomanUtils.addControls(leafletMap, geomanControlOptions);
+        //multiple invocations should not duplicate layeradd listeners
+        GeomanUtils.addControls(leafletMap, geomanControlOptions);
+        GeomanUtils.addControls(leafletMap, geomanControlOptions);
+
+        FeatureGroup editFeatureGroup = new FeatureGroup();
+        editFeatureGroup.setAttribution("Editable group");
+        editFeatureGroup.addTo(leafletMap);
+
+        LayersControl leafletControl = new LayersControl();
+        leafletControl.addTo(leafletMap);
+        //set the editable feature group before adding any layers to it
+        GeomanUtils.setEditableFeatureGroup(leafletMap, editFeatureGroup);
+        //add layers to the editable feature group should make them editable
+        LayerGroup circles = createRandomCircles(4);
+        circles.addTo(editFeatureGroup);
+        leafletControl.addOverlay(circles, "LayerGroup in editable layer");
+        //add layers that are not editable
+        LayerGroup notEditableMarkers = createRandomMarkers(DEFAULT_ICON, 4);
+        notEditableMarkers.addTo(leafletMap);
+        leafletControl.addOverlay(notEditableMarkers, "Not editable LayerGroup");
 
         leafletMap.onCreate(event -> {
             String newLayerId = event.getNewLayerId();
@@ -77,6 +102,16 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
                     : "Layer %s of type %s created BUT NOT added to the server map!";
 
             Notification.show(String.format(message, newLayerId, event.getShape()));
+            if (layer instanceof Circle || layer instanceof Marker) {
+                editFeatureGroup.removeLayer(layer);
+                if (layer instanceof Circle) {
+                    Notification.show(String.format("new circle %s moved to circles editable subtree", layer.getUuid()));
+                    circles.addLayer(new Circle(((Circle) layer).getLatlng(), 15000)); //after adding it here, it should still be editable
+                } else {
+                    Notification.show(String.format("new marker %s moved to the not editable markers layer", layer.getUuid()));
+                    notEditableMarkers.addLayer(layer);
+                }
+            }
         });
 
         leafletMap.onRemove(event -> {
@@ -92,21 +127,6 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         leafletMap.onLayerUpdated(event ->
                 Notification.show(String.format("Some layer %s of type %s was edited by the user",
                         event.getLayerId(), event.getShape())));
-
-        LayersControl leafletControl = new LayersControl();
-        leafletControl.addTo(leafletMap);
-
-        FeatureGroup editFeatureGroup = new FeatureGroup();
-        editFeatureGroup.setAttribution("Editable group");
-        editFeatureGroup.addTo(leafletMap);
-
-        leafletControl.addOverlay(editFeatureGroup, "Editable Layer");
-
-        Button editButton = new Button("Edit feature group");
-        editButton.addClickListener(event -> {
-            GeomanUtils.setEditableFeatureGroup(leafletMap, editFeatureGroup);
-        });
-
         Button drawPolygonButton = new Button("Draw Polygons",
                 event -> GeomanUtils.enableDraw(leafletMap, ShapeType.POLYGON));
 
@@ -124,11 +144,6 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         editRemoveButton.addClickListener(event -> GeomanUtils.removeControls(leafletMap));
 
         leafletMap.on(EditEventType.update, e -> Notification.show("Modifications arrive to the map!!!"));
-
-        GeomanControlOptions geomanControlOptions = new GeomanControlOptions();
-        geomanControlOptions.setCutPolygon(false);
-        geomanControlOptions.setDrawCircleMarker(false);
-        GeomanUtils.addControls(leafletMap, geomanControlOptions);
 
         CheckboxGroup<ShapeType> checkboxGroup = new CheckboxGroup<>();
         checkboxGroup.setItems(ShapeType.values());
@@ -149,9 +164,9 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
         parent.setAttribution("Parent");
         log.error("created parent {}", parent.getUuid());
 
-        marker.addTo(parent);
-        parent.addTo(ancestor);
-        ancestor.addTo(leafletMap);
+//        marker.addTo(parent);
+//        parent.addTo(ancestor);
+//        ancestor.addTo(leafletMap);
 
         // OK all good
         //        ancestor.addTo(leafletMap);
@@ -166,12 +181,23 @@ public class GeomanEditMapPluginExample extends ExampleContainer {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.add(new HorizontalLayout(editButton, drawPolygonButton, tryReplaceButton, editRemoveButton, deleteButton, setDefaultMarkerButton));
+        verticalLayout.add(new HorizontalLayout(drawPolygonButton, tryReplaceButton, editRemoveButton, deleteButton, setDefaultMarkerButton));
         verticalLayout.add(checkboxGroup);
         verticalLayout.add(leafletMap);
         addToContent(verticalLayout);
 
         deleteButton.addClickListener(e -> marker.remove());
+    }
+
+    private LayerGroup createRandomCircles(int limit) {
+        LayerGroup layerGroup = new LayerGroup();
+        range(0, limit).forEach((i) -> {
+            double lat = (Math.random() * 4) + 45;
+            double lon = (Math.random() * 7) + 16;
+            Circle marker = new Circle(latlng(lat, lon), 15000);
+            marker.addTo(layerGroup);
+        });
+        return layerGroup;
     }
 
     private LayerGroup createRandomMarkers(Icon icon, int limit) {
