@@ -193,15 +193,16 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     if ("pm.addControls" === functionName) {
       L.PM.reInitLayer(this.map);
 
-      let thisLeafletMap = this;
-      // every new Layer that is created by the user should have a pm:update listener to sync with the server
-      this.map.on("pm:create", function (event) {
-        event.layer.options.pmIgnore = false; //make layer editable
-        L.PM.reInitLayer(event.layer)
-        if (thisLeafletMap._isInteresting(event.layer)) {
-          event.layer.on("pm:update", thisLeafletMap.onLayerEditedOnClient, this);
-        }
-      }, this)
+      if (!this._pmCreateRegistered) { //ensure we add the listener only once
+        let thisLeafletMap = this;
+        // every new Layer that is created by the user should have a pm:update listener to sync with the server
+        this.map.on("pm:create", function (event) {
+          if (thisLeafletMap._isInteresting(event.layer)) {
+            event.layer.on("pm:update", thisLeafletMap.onLayerEditedOnClient, this);
+          }
+        }, this);
+        this._pmCreateRegistered = true;
+      }
     }
     if ("pm.enableEditing" === functionName) {
       this.setPmIgnoreRecursively(target.pm.globalOptions.layerGroup, false);
