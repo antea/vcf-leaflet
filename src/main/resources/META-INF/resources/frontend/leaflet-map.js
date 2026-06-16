@@ -87,6 +87,25 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     // 1. Set Opt-In immediately
     L.PM.setOptIn(true);
     this.map = this.toLeafletMap(options);
+    const geomanEvents = [
+      "pm:globaleditmodetoggled",
+      "pm:globaldragmodetoggled",
+      "pm:globalremovalmodetoggled",
+      "pm:globaldrawmodetoggled"
+    ];
+
+    geomanEvents.forEach(eventName => {
+      this.map.on(eventName, (e) => {
+        console.info("Geoman Button Toggle Fired Successfully!", eventName, e.enabled);
+        this.dispatchEvent(new CustomEvent(eventName, {
+          detail: {
+            enabled: e.enabled
+          },
+          bubbles: true,   // Let it float up to parent components
+          composed: true  // Let it break through Shadow DOM walls
+        }));
+      });
+    });
   }
 
   /**
