@@ -77,12 +77,12 @@ echo
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Check whether we are in the branch we are supposed to be (the vaadin23/ branch for the declared version)
-if [[ $CURRENT_BRANCH != "vaadin23" ]]; then
-  echo "${star}${error}Releases can only be made from the vaadin23 branch. Current branch is $CURRENT_BRANCH.$r"
+# Check whether we are in the branch we are supposed to be (the vaadin24/ branch for the declared version)
+if [[ $CURRENT_BRANCH != "vaadin24" ]]; then
+  echo "${star}${error}Releases can only be made from the vaadin24 branch. Current branch is $CURRENT_BRANCH.$r"
   exit 1
 else
-  echo "${info}Good, we are in the vaadin23 branch: $CURRENT_BRANCH$r"
+  echo "${info}Good, we are in the vaadin24 branch: $CURRENT_BRANCH$r"
 fi
 echo
 
