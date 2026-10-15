@@ -56,6 +56,7 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   connectedCallback() {
     super.connectedCallback();
     // console.log("LeafletMap - connectedCallback()");
+    this._installResizeObserver();
   }
 
   /**
@@ -66,6 +67,33 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
   disconnectedCallback() {
     super.disconnectedCallback();
     // console.log("LeafletMap - disconnectedCallback()");
+    this._uninstallResizeObserver();
+  }
+
+  /**
+   * Initializes and installs a ResizeObserver instance to monitor size changes of the current map.
+   * When size changes are detected, it debounces the updates to prevent frequent render updates the layout.
+   */
+  _installResizeObserver() {
+    if (this._resizeObserver || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    this._resizeObserver = new ResizeObserver((entries) => {
+      const { width, height } = entries[entries.length - 1].contentRect;
+      if (!width || !height) {
+        return; // hidden (tab, dialog, collapsed panel): nothing to lay out, fires again when shown
+      }
+      clearTimeout(this._resizeTimer);
+      const DEBOUNCE_TIMEOUT = 500; //Control resize event brust, delay certain time in X ms.
+      this._resizeTimer = setTimeout(() => this.map?.invalidateSize({ pan: false }), DEBOUNCE_TIMEOUT);
+    });
+    this._resizeObserver.observe(this);
+  }
+
+  _uninstallResizeObserver() {
+    clearTimeout(this._resizeTimer);
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = null;
   }
 
   /**
