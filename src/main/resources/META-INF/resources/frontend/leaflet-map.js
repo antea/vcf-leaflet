@@ -78,14 +78,15 @@ class LeafletMap extends ThemableMixin(PolymerElement) {
     if (this._resizeObserver || typeof ResizeObserver === "undefined") {
       return;
     }
+    const DEBOUNCE_TIMEOUT = 500; //Control resize event burst, delay certain time in X ms.
+    const invalidateMapSize = () => this.map?.invalidateSize({ pan: false });
     this._resizeObserver = new ResizeObserver((entries) => {
       const { width, height } = entries[entries.length - 1].contentRect;
       if (!width || !height) {
         return; // hidden (tab, dialog, collapsed panel): nothing to lay out, fires again when shown
       }
       clearTimeout(this._resizeTimer);
-      const DEBOUNCE_TIMEOUT = 500; //Control resize event brust, delay certain time in X ms.
-      this._resizeTimer = setTimeout(() => this.map?.invalidateSize({ pan: false }), DEBOUNCE_TIMEOUT);
+      this._resizeTimer = setTimeout(invalidateMapSize, DEBOUNCE_TIMEOUT);
     });
     this._resizeObserver.observe(this);
   }
