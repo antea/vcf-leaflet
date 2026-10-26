@@ -65,13 +65,15 @@ else
   exit 1
 fi
 
-# Remove the -SNAPSHOT suffix
-VERSION=${RAW_VERSION//-SNAPSHOT/}
-echo "${info}Releasing version $VERSION.$r"
+# Remove the -SNAPSHOT suffix and any existing -ANTEA suffix, then add it to the release version.
+BASE_VERSION=${RAW_VERSION%-SNAPSHOT}
+BASE_VERSION=${BASE_VERSION%-ANTEA}
+RELEASE_VERSION="${BASE_VERSION}-ANTEA"
+echo "${info}Releasing version $RELEASE_VERSION.$r"
 echo
 
 # Calculate the next version (i.e. increment the version number)
-NEXTVERSION=$(echo "$VERSION" | awk -F. -v OFS=. '{print $1"."$2"."$3"."($4+1)}')
+NEXTVERSION=$(echo "$BASE_VERSION" | awk -F. -v OFS=. '{print $1"."$2"."$3"."($4+1)}')
 echo "${info}Next version will be $NEXTVERSION-SNAPSHOT.$r"
 echo
 
@@ -91,24 +93,24 @@ echo
 ###############################################################################
 
 # Updating the POMs
-echo "${info}Updating POMs to version ${VERSION}.$r"
-mvnd versions:set -DautoVersionSubmodules=true -P${PROFILES} -DnewVersion="${VERSION}"
+echo "${info}Updating POMs to version ${RELEASE_VERSION}.$r"
+mvnd versions:set -DautoVersionSubmodules=true -P${PROFILES} -DnewVersion="${RELEASE_VERSION}"
 echo "${info}POMs are updated. Committing and tagging...$r"
 
-git commit -am"Version ${VERSION}"
-git tag "v${VERSION}"
-echo "${info}Pushing the v${VERSION} tag to origin.$r"
-git push --tags origin
+git commit -am"Version ${RELEASE_VERSION}"
+#git tag "v${RELEASE_VERSION}"
+echo "${info}Pushing the v${RELEASE_VERSION} tag to origin.$r"
+#git push --tags origin
 
 echo "${info}Deploying to CGP Artifact Registry"
-mvnd clean deploy -P${PROFILES}
+#mvnd clean deploy -P${PROFILES}
 
-echo "${info}Updating POMs to version ${NEXTVERSION}.$r"
+echo "${info}Updating POMs to version ${NEXTVERSION}-SNAPSHOT.$r"
 mvnd versions:set -DautoVersionSubmodules=true -P${PROFILES} -DnewVersion="${NEXTVERSION}-SNAPSHOT"
 git commit -am"Version bump"
-git push
+#git push
 echo "${info}POMs are updated.$r"
 
 echo "${info}All done.$r"
 echo "${instruction}Remember to:"
-echo "   - mark $VERSION as released and archived $NEXTVERSION: https://antea.myjetbrains.com/youtrack/projects/VL?tab=fields"
+echo "   - mark $RELEASE_VERSION as released and archived $NEXTVERSION: https://antea.myjetbrains.com/youtrack/projects/VL?tab=fields"
