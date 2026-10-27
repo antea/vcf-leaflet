@@ -98,17 +98,17 @@ mvnd versions:set -DautoVersionSubmodules=true -P${PROFILES} -DnewVersion="${REL
 echo "${info}POMs are updated. Committing and tagging...$r"
 
 git commit -am"Version ${RELEASE_VERSION}"
-#git tag "v${RELEASE_VERSION}"
+git tag "v${RELEASE_VERSION}"
 echo "${info}Pushing the v${RELEASE_VERSION} tag to origin.$r"
-#git push --tags origin
+git push --tags origin
 
 echo "${info}Deploying to CGP Artifact Registry"
-#mvnd clean deploy -P${PROFILES}
+mvnd clean deploy -P${PROFILES}
 
 echo "${info}Updating POMs to version ${NEXTVERSION}-SNAPSHOT.$r"
 mvnd versions:set -DautoVersionSubmodules=true -P${PROFILES} -DnewVersion="${NEXTVERSION}-SNAPSHOT"
 git commit -am"Version bump"
-#git push
+git push
 echo "${info}POMs are updated.$r"
 
 echo "${info}All done.$r"
