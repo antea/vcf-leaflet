@@ -75,7 +75,7 @@ See more examples on [vcf-leaflet-demo](https://github.com/vaadin-component-fact
 
 Starting the test/demo server:
 1. Run `mvn jetty:run`.
-2. Open http://localhost:8080 in the browser.
+2. Open http://localhost:9080 in the browser.
 
 ## License 
 
